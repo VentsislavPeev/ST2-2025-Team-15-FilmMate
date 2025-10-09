@@ -1,0 +1,58 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Django ---
+*.log
+*.pot
+*.pyc
+*.pyo
+*.mo
+db.sqlite3
+media/
+staticfiles/
+static_root/
+static/
+.env
+.env.*
+.env.local
+
+# --- Virtual Environment ---
+venv/
+.envrc
+.venv/
+pip-wheel-metadata/
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# --- IDEs & Editors ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- OS-specific ---
+.DS_Store
+Thumbs.db
+
+# --- Docker ---
+/data/
+docker-compose.override.yml
+*.pid
+
+# --- Coverage / Testing ---
+.coverage
+htmlcov/
+.cache/
+pytest_cache/
+coverage.xml
+
+# --- Node / Frontend (if you add React later) ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
