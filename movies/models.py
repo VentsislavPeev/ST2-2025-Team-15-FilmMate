@@ -1,11 +1,12 @@
 from django.db import models
-from genres.models import Genre
 
 class Movie(models.Model):
     title = models.CharField(max_length=200)
     year = models.IntegerField()
-    genres = models.ManyToManyField(Genre,related_name='genres')
     director = models.CharField(max_length=100)
+    genres = models.ManyToManyField('genres.Genre', related_name='movie_genres')
+    lists = models.ManyToManyField('lists.List', related_name='movie_lists')
+
     poster = models.ImageField(upload_to='posters/')
     description = models.TextField()
 
