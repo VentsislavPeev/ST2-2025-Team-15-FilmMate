@@ -1,10 +1,6 @@
-# movies/views.py
 from django.shortcuts import render
+from django.http import HttpResponse
 
-def home_view(request):
-    # fake data for now
-    movies = [
-        {"title": "Inception", "year": 2010, "genre": "Sci-Fi"},
-        {"title": "Interstellar", "year": 2014, "genre": "Adventure"},
-    ]
-    return render(request, "movies/home.html", {"movies": movies})
+def movie_list(request):
+    return HttpResponse("This will be the list of movies.")
+
