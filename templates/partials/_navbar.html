@@ -1,16 +1,19 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-black border-bottom border-secondary">
   <div class="container-fluid">
-    <a class="navbar-brand text-success fw-bold" href="{% url 'movies:home' %}">FilmMate</a>
+    <a class="navbar-brand text-success fw-bold" href="{% url 'home' %}">FilmMate</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="collapse navbar-collapse" id="navbarNav">
-      <form class="d-flex ms-auto me-4" role="search" method="get" action="{% url 'movies:home' %}">
-        <input class="form-control form-control-sm bg-dark text-light border-0" type="search" placeholder="Search films..." name="q">
+      <form class="d-flex ms-auto me-4" role="search" method="get" action="{% url 'home' %}">
+        <input class="form-control form-control-sm bg-dark text-light border-0" 
+               type="search" placeholder="Search films..." name="q">
       </form>
       <ul class="navbar-nav">
-        <li class="nav-item"><a class="nav-link" href="{% url 'movies:home' %}">Home</a></li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'home' %}">Home</a>
+        </li>
       </ul>
     </div>
   </div>
