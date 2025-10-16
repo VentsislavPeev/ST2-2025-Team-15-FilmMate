@@ -1,20 +1,37 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-black border-bottom border-secondary">
-  <div class="container-fluid">
-    <a class="navbar-brand text-success fw-bold" href="{% url 'home' %}">FilmMate</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary">
+  <div class="container">
+    <!-- Brand -->
+    <a class="navbar-brand fw-bold" href="{% url 'movies:home' %}">FilmMate</a>
+
+    <!-- Mobile toggle -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <form class="d-flex ms-auto me-4" role="search" method="get" action="{% url 'home' %}">
-        <input class="form-control form-control-sm bg-dark text-light border-0" 
-               type="search" placeholder="Search films..." name="q">
-      </form>
-      <ul class="navbar-nav">
+    <!-- Navbar content -->
+    <div class="collapse navbar-collapse justify-content-between" id="navbarContent">
+      <!-- Left links -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'home' %}">Home</a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+             href="{% url 'movies:home' %}">
+             Home
+          </a>
         </li>
       </ul>
+
+      <!-- Search form -->
+      <form class="d-flex" method="get" action="{% url 'movies:home' %}">
+        <input
+          class="form-control me-2 bg-dark text-light border-secondary"
+          type="search"
+          name="q"
+          placeholder="Search movies..."
+          aria-label="Search"
+          value="{{ request.GET.q }}"
+        >
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
     </div>
   </div>
 </nav>

@@ -19,8 +19,9 @@ from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('movies/', include('movies.urls')),
+    path('', include('movies.urls')),  # mount movies app here
     path('reviews/', include('reviews.urls')),
     path('lists/', include('lists.urls')),
     path('users/', include('users.urls')),
 ]
+
