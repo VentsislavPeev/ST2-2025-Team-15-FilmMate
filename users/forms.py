@@ -30,10 +30,6 @@ class CustomUserCreationForm(UserCreationForm):
 
 
 class CustomAuthenticationForm(AuthenticationForm):
-    class Meta:
-        model = CustomUser
-        fields = ("username", "password")
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['username'].widget = forms.TextInput(attrs={
