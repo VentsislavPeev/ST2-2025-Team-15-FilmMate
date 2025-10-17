@@ -20,16 +20,15 @@
         </li>
       </ul>
 
-      <!-- Search form -->
       <form class="d-flex" method="get" action="{% url 'movies:movie_search' %}">
-        <input
-          class="form-control me-2 bg-dark text-light border-secondary"
-          type="search"
-          name="q"
-          placeholder="Search movies..."
-          aria-label="Search"
-          value="{{ request.GET.q }}"
-        >
+    <input
+     name="q"
+     class="form-control me-2 bg-dark text-light border-secondary"
+     type="search"
+     placeholder="Search movies"
+     aria-label="Search">
+      </form>
+      
         <button class="btn btn-outline-success" type="submit">Search</button>
       </form>
     </div>
