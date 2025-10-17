@@ -1,11 +1,10 @@
 from django.urls import path
 from . import views
-from django.http import HttpResponse
-
-def movie_list(request):
-    return HttpResponse("Movie list placeholder")
 
 app_name = 'movies'
+
 urlpatterns = [
-    path('', views.movie_list, name='home'),  
+    path('', views.movie_home, name='home'),      
+    path('list/', views.movie_list, name='movie_list'), 
+    path('search/', views.movie_search, name='movie_search'), 
 ]
