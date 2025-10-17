@@ -8,7 +8,7 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('home')  # Change to your homepage
+            return redirect('/')  # Change to your homepage
     else:
         form = CustomUserCreationForm()
     return render(request, 'users/signup.html', {'form': form})
@@ -19,11 +19,11 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('home')
+            return redirect('/')
     else:
         form = CustomAuthenticationForm()
     return render(request, 'users/login.html', {'form': form})
 
 def logout_view(request):
     logout(request)
-    return redirect('home')
+    return redirect('/')
