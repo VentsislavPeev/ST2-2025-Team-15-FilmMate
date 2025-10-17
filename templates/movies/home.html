@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Home - FilmMate{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+  <!-- POPULAR THIS WEEK -->
+  <section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="fw-bold text-light mb-0">Popular This Week</h3>
+      <a href="#" class="text-light small text-decoration-none">View all →</a>
+    </div>
+
+    <div class="d-flex flex-row overflow-auto gap-3 pb-2">
+      {% for film in popular_films %}
+        <div class="film-card flex-shrink-0" style="width: 160px;">
+          <a href="{% url 'movies:movie_detail' film.id %}" class="text-decoration-none text-light">
+            <img src="{{ film.poster.url }}" class="img-fluid rounded shadow-sm poster" alt="{{ film.title }}">
+            <div class="overlay d-flex flex-column justify-content-center align-items-center text-center p-2">
+              <h6 class="fw-semibold mb-1 small">{{ film.title }}</h6>
+              <small class="text-muted">{{ film.year }}</small>
+            </div>
+          </a>
+        </div>
+      {% empty %}
+        <p class="text-light small mb-0">No popular films yet.</p>
+      {% endfor %}
+    </div>
+  </section>
+
+  <hr class="border-secondary opacity-25 my-5">
+
+  <!-- NEW FROM FRIENDS -->
+  <section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="fw-bold text-light mb-0">New From Friends</h3>
+      <a href="#" class="text-light small text-decoration-none">See all activity →</a>
+    </div>
+
+    {% if friend_activities %}
+      <div class="list-group">
+        {% for activity in friend_activities %}
+          <div class="list-group-item bg-dark border-secondary text-light d-flex align-items-start py-3">
+            <img src="{{ activity.user.profile_pic.url }}" class="rounded-circle me-3" width="45" height="45" alt="{{ activity.user.username }}">
+            <div>
+              <strong>{{ activity.user.username }}</strong>
+              <span class="text-secondary small">watched</span>
+              <a href="{% url 'movies:movie_detail' activity.film.id %}" class="text-light fw-semibold text-decoration-none">
+                {{ activity.film.title }}
+              </a>
+              {% if activity.rating %}
+                <span class="text-warning small">★ {{ activity.rating }}/5</span>
+              {% endif %}
+              {% if activity.comment %}
+                <p class="mb-0 text-secondary small mt-1">“{{ activity.comment }}”</p>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-light small mb-0">No recent activity from friends.</p>
+    {% endif %}
+  </section>
+
+</div>
+
+{% endblock %}
