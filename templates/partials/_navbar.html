@@ -21,16 +21,49 @@
       </ul>
 
       <form class="d-flex" method="get" action="{% url 'movies:movie_search' %}">
-    <input
-     name="q"
-     class="form-control me-2 bg-dark text-light border-secondary"
-     type="search"
-     placeholder="Search movies"
-     aria-label="Search">
+        <input
+          name="q"
+          class="form-control me-2 bg-dark text-light border-secondary"
+          type="search"
+          placeholder="Search movies"
+          aria-label="Search">
+        <button class="btn btn-outline-success ms-1" type="submit">Search</button>
       </form>
-      
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
+
+      <!-- Right side: auth actions -->
+      <ul class="navbar-nav ms-3 mb-2 mb-lg-0">
+        {% if request.user.is_authenticated %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {% if request.user.profile_pic %}
+                <img src="{{ request.user.profile_pic.url }}" alt="{{ request.user.username }}" class="rounded-circle" width="36" height="36">
+              {% else %}
+                <!-- SVG avatar placeholder -->
+                <svg class="rounded-circle bg-secondary" width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+                  <rect width="24" height="24" rx="12" fill="#6c757d" />
+                  <path d="M12 12a3 3 0 100-6 3 3 0 000 6zm0 2c-3 0-5 1.5-5 3v1h10v-1c0-1.5-2-3-5-3z" fill="#fff"/>
+                </svg>
+              {% endif %}
+              <span class="ms-2 d-none d-lg-inline">{{ request.user.username }}</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+              <li><a class="dropdown-item" href="#">Profile</a></li>
+              <li><a class="dropdown-item" href="#">Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <form method="post" action="{% url 'logout' %}">
+                  {% csrf_token %}
+                  <button type="submit" class="dropdown-item">Log out</button>
+                </form>
+              </li>
+            </ul>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="btn btn-outline-light ms-2" href="{% url 'login' %}">Log in</a>
+          </li>
+        {% endif %}
+      </ul>
     </div>
   </div>
 </nav>
