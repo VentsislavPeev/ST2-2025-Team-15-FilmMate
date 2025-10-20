@@ -48,7 +48,7 @@ class Command(BaseCommand):
             # Add poster if available
             if poster_path:
                 poster_url = f"{TMDB_IMAGE_BASE}{poster_path}"
-                response = requests.get(poster_url)
+                response = requests.get(poster_url, timeout=10)
                 if response.status_code == 200:
                     # Save poster to ImageField
                     movie.poster.save(
