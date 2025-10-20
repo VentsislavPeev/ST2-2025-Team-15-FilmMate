@@ -4,8 +4,9 @@ from genres.models import Genre
 import tmdbsimple as tmdb
 import requests
 from django.core.files.base import ContentFile
+import os
 
-tmdb.API_KEY = 'b85cd30c758ab8c37eaec969e07e1b53'  
+tmdb.API_KEY = os.environ.get('TMDB_API_KEY')
 TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w500'  # Base URL for poster images
 
 class Command(BaseCommand):
