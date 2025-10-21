@@ -11,8 +11,6 @@ class CustomUser(AbstractUser):
         related_name='friends_rel',
         help_text='Users you are friends with'
     )
-    
-
     def __str__(self):
         return self.username
 
