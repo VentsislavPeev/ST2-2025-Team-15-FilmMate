@@ -49,7 +49,7 @@ def send_friend_request(request, user_id):
         return HttpResponseForbidden("Cannot friend yourself")
     to_user = get_object_or_404(CustomUser, pk=user_id)
     # prevent duplicate requests or if already friends
-    if FriendRequest.objects.filter(from_user=request.user, to_user=to_user).exists() or to_user in request.user.friends.all():
+    if FriendRequest.objects.filter(from_user=request.user, to_user=to_user).exists() or request.user.friends.filter(pk=to_user.pk).exists():
         messages.info(request, 'Friend request already sent or you are already friends.')
         return redirect(reverse('users:friend_requests'))
     FriendRequest.objects.create(from_user=request.user, to_user=to_user)
