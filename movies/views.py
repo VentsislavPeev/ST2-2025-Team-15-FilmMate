@@ -1,8 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from .models import Movie
 
 def movie_home(request):
-    popular_films = Movie.objects.all()[:20] 
+    popular_films = Movie.objects.all()[7:14] 
     friend_activities = [] 
 
     context = {
@@ -33,3 +33,7 @@ def movie_search(request):
         'query': query,
     }
     return render(request, 'movies/home.html', context)
+
+def movie_detail(request, pk):
+    movie = get_object_or_404(Movie, pk=pk)
+    return render(request, 'movies/movie_detail.html', {'movie': movie})
