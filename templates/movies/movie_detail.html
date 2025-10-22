@@ -12,7 +12,11 @@
         <div class="card-body">
           <h3 class="card-title mb-1">{{ movie.title }} <small class="text-muted">({{ movie.year }})</small></h3>
           <p class="mb-1 small text-muted">Directed by {{ movie.director }}</p>
-          <p class="mb-2"><strong class="text-warning">★ {{ movie.rating|floatformat:1 }}/5</strong></p>
+          {% if movie.rating == 0 %}
+            <p class="mb-2"><strong class="text-warning">No reviews yet</strong></p>
+          {% else %} 
+            <p class="mb-2"><strong class="text-warning">★ {{ movie.rating|floatformat:1 }}</strong></p>
+          {% endif %}
 
           <div class="mb-2">
             <strong>Genres: </strong>
@@ -29,8 +33,8 @@
 
     <!-- Right column: description, user actions, reviews -->
     <div class="col-lg-8">
-      <div class="card p-3">
-        <div class="card-body">
+      <div class="card p-3 bg-dark text-light border-secondary">
+        <div class="card-body ">
           <div class="d-flex justify-content-between align-items-start">
             <h4 class="mb-2">Overview</h4>
             <div>
@@ -41,7 +45,7 @@
                 </form>
                 <a href="#" class="btn btn-primary btn-sm">Write a Review</a>
               {% else %}
-                <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary btn-sm">Log in to interact</a>
+                <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-primary btn-sm">Login to review</a>
               {% endif %}
             </div>
           </div>
