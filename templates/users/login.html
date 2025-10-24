@@ -54,6 +54,11 @@
                 </div>
               </form>
 
+                <div class="mt-3">
+                  {% load socialaccount %}
+                  <a href="{% provider_login_url 'google' process='login' %}?next=/" class="btn btn-outline-danger w-100">Sign in with Google</a>
+                </div>
+
               <div class="mt-3 small">
                 <span class="text-muted">Don't have an account?</span>
                 <a href="{% url 'users:signup' %}" class="ms-1">Sign up</a>
