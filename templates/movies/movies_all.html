@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}All Movies - FilmMate{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h2 class="text-light mb-4 fw-bold">All Movies</h2>
+
+  <!-- Search + Filters -->
+  <form method="get" class="row g-2 mb-4">
+    <div class="col-md-4">
+      <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search movies...">
+    </div>
+
+    <!-- Genre Dropdown -->
+    <div class="col-md-3">
+      <select name="genre" class="form-select">
+        <option value="">All Genres</option>
+        {% for g in genres %}
+          <option value="{{ g.name }}" {% if genre_filter == g.name %}selected{% endif %}>{{ g.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-3">
+      <select name="sort" class="form-select">
+        <option value="title" {% if sort == 'title' %}selected{% endif %}>Sort by Title</option>
+        <option value="year" {% if sort == 'year' %}selected{% endif %}>Sort by Year</option>
+        <option value="director" {% if sort == 'director' %}selected{% endif %}>Sort by Director</option>
+      </select>
+    </div>
+
+    <div class="col-md-2">
+      <button class="btn btn-primary w-100" type="submit">Apply</button>
+    </div>
+  </form>
+
+  <!-- Movie Grid -->
+  <div class="row row-cols-2 row-cols-md-4 g-4">
+    {% for movie in page_obj %}
+      <div class="col">
+        <div class="card bg-dark text-light h-100 border-secondary">
+          <a href="{% url 'movies:movie_detail' movie.id %}" class="text-decoration-none">
+            {% if movie.poster %}
+              <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}">
+            {% else %}
+              <img src="{% static 'images/default_poster.jpg' %}" class="card-img-top" alt="No poster available">
+            {% endif %}
+          </a>
+          <div class="card-body">
+            <h6 class="card-title">{{ movie.title }}</h6>
+            <p class="card-text small text-muted mb-1">{{ movie.director }}</p>
+            <p class="card-text small">{{ movie.year }}</p>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-light">No movies found.</p>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination Controls -->
+  <nav aria-label="Movies pagination" class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link bg-dark text-light border-secondary" href="?page={{ page_obj.previous_page_number }}&q={{ query }}&genre={{ genre_filter }}&sort={{ sort }}">Previous</a>
+        </li>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+          <a class="page-link bg-dark text-light border-secondary" href="?page={{ num }}&q={{ query }}&genre={{ genre_filter }}&sort={{ sort }}">{{ num }}</a>
+        </li>
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link bg-dark text-light border-secondary" href="?page={{ page_obj.next_page_number }}&q={{ query }}&genre={{ genre_filter }}&sort={{ sort }}">Next</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% endblock %}
