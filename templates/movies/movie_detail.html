@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ movie.title }} ({{ movie.year }}) — FilmMate{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+  <div class="row g-4">
+    <!-- Left column: poster + basic info -->
+    <div class="col-lg-3">
+      <div class="card bg-dark text-light border-secondary">
+        <img src="{{ movie.poster.url }}" class="card-img-top img-fluid" alt="{{ movie.title }} poster">
+        <div class="card-body">
+          <p class="mb-1 small ">Directed by {{ movie.director }}</p>
+
+          
+
+          <p class="small text-muted">Last updated: {{ movie.rating_last_updated|date:'SHORT_DATETIME_FORMAT' }}</p>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Center column: description, reviews -->
+    <div class="col-lg-5 border-0">
+      <div class="card p-3 bg-dark text-light border-0">
+        <div class="card-body ">
+          <div class="d-flex justify-content-between align-items-start">
+            <h2 class="mb-2">{{ movie.title }}</h2>
+          </div>
+
+          <p class="mt-2">{{ movie.description }}</p>
+
+          <hr>
+
+          <div class="mb-2">
+            <strong>Genres: </strong>
+            <!-- TODO: Make the genre links functional; Redirect to all movies of a certain genre when clicked. -->
+            {% for g in movie.genres.all %}
+              <a href="#" class="badge bg-secondary text-light me-1">{{ g.name }}</a>
+            {% endfor %}
+          </div>
+
+
+          <hr>
+
+          <h5>Community reviews</h5>
+          {% if reviews %}
+            <ul class="list-unstyled">
+              {% for review in reviews %}
+                <li class="mb-3">
+                  <div class="d-flex align-items-start">
+                    <img src="{{ review.user.profile_pic.url|default_if_none:'' }}" class="rounded-circle me-3" width="48" height="48" alt="{{ review.user.username }}">
+                    <div>
+                      <div class="d-flex align-items-center">
+                        <strong>{{ review.user.username }}</strong>
+                        <small class="text-muted ms-2">{{ review.date|date:'SHORT_DATETIME_FORMAT' }}</small>
+                      </div>
+                      <div class="small text-warning">★ {{ review.rating|divisibleby:2 }}/5</div>
+                      <p class="mb-0">{{ review.text }}</p>
+                    </div>
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted">No reviews yet.</p>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card p-3 bg-dark text-light border-secondary">
+        <div class="card-body ">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <!-- TODO: Make the buttons functional -->
+              {% if request.user.is_authenticated %}
+                <form method="post" action="#" class="d-inline me-2">
+                  {% csrf_token %}
+                  <button class="btn btn-outline-light btn-sm">Add to Watchlist</button>
+                </form>
+                <a href="#" class="btn btn-primary btn-sm">Write a Review</a>
+              {% else %}
+                <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-primary btn-sm">Login to review</a>
+              {% endif %}
+              
+            </div>
+          </div>
+          <hr>
+                    {% if movie.rating == 0 %}
+            <p class="mb-2"><strong class="text-warning">No reviews yet</strong></p>
+          {% else %} 
+            <p class="mb-2"><strong class="text-warning">★ {{ movie.rating|floatformat:1 }}</strong></p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
