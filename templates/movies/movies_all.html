@@ -68,11 +68,39 @@
         </li>
       {% endif %}
 
-      {% for num in page_obj.paginator.page_range %}
-        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
-          <a class="page-link bg-dark text-light border-secondary" href="?page={{ num }}&q={{ query }}&genre={{ genre_filter }}&sort={{ sort }}">{{ num }}</a>
-        </li>
-      {% endfor %}
+      {# Sliding window pagination: show first, last, current±2, with ellipses #}
+      {% with total_pages=page_obj.paginator.num_pages current=page_obj.number %}
+        {% if total_pages > 1 %}
+          {# Always show first page #}
+          <li class="page-item {% if current == 1 %}active{% endif %}">
+            <a class="page-link bg-dark text-light border-secondary" href="?page=1&q={{ query }}&genre={{ genre_filter }}&sort={{ sort }}">1</a>
+          </li>
+          {# Show ellipsis if needed #}
+          {% if current|add:'-2' > 2 %}
+            <li class="page-item disabled"><span class="page-link bg-dark text-light border-secondary">...</span></li>
+          {% endif %}
+          {# Show pages current-2 to current+2 #}
+          {% for num in total_pages|make_list %}
+            {% with num=num|stringformat:"i" %}
+              {% if num|add:'0' >= current|add:'-2' and num|add:'0' <= current|add:'2' and num|add:'0' != 1 and num|add:'0' != total_pages %}
+                <li class="page-item {% if current == num|add:'0' %}active{% endif %}">
+                  <a class="page-link bg-dark text-light border-secondary" href="?page={{ num }}&q={{ query }}&genre={{ genre_filter }}&sort={{ sort }}">{{ num }}</a>
+                </li>
+              {% endif %}
+            {% endwith %}
+          {% endfor %}
+          {# Show ellipsis if needed #}
+          {% if current|add:'2' < total_pages|add:'-1' %}
+            <li class="page-item disabled"><span class="page-link bg-dark text-light border-secondary">...</span></li>
+          {% endif %}
+          {# Always show last page if more than one #}
+          {% if total_pages > 1 %}
+            <li class="page-item {% if current == total_pages %}active{% endif %}">
+              <a class="page-link bg-dark text-light border-secondary" href="?page={{ total_pages }}&q={{ query }}&genre={{ genre_filter }}&sort={{ sort }}">{{ total_pages }}</a>
+            </li>
+          {% endif %}
+        {% endif %}
+      {% endwith %}
 
       {% if page_obj.has_next %}
         <li class="page-item">
