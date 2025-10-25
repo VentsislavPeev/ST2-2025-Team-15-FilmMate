@@ -23,8 +23,9 @@ def list_create(request):
         new_list.movies.set(movie_ids)
         return redirect('lists:list_overview')
 
-    movies = Movie.objects.all()
+    movies = Movie.objects.all()[:20]
     return render(request, 'lists/list_create.html', {'movies': movies})
+
 
 @login_required
 def list_detail(request, pk):
