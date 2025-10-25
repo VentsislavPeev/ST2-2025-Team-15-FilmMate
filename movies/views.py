@@ -54,7 +54,7 @@ def movies_all(request):
 
     # Filter by genre
     if genre_filter:
-        movies = movies.filter(genres__name__iexact=genre_filter)
+        movies = movies.filter(genres__name__iexact=genre_filter).distinct()
 
     # Sorting
     if sort in ['title', 'year', 'director']:
