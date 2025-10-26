@@ -24,8 +24,17 @@
              Home
           </a>
         </li>
+
+        <!-- All Movies Button -->
+        <li class="nav-item">
+          <a class="btn btn-outline-light ms-3 {% if request.resolver_match.url_name == 'movies_all' %}active{% endif %}"
+             href="{% url 'movies:movies_all' %}">
+             🎬 All Movies
+          </a>
+        </li>
       </ul>
 
+      <!-- Search bar -->
       <form class="d-flex" method="get" action="{% url 'movies:movie_search' %}">
         <input
           name="q"
@@ -73,3 +82,4 @@
     </div>
   </div>
 </nav>
+
