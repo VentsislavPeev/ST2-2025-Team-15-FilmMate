@@ -2,7 +2,14 @@
 {% block content %}
 <div class="container mt-5">
   <h2>Edit List: {{ list.name }}</h2>
-  <form method="post">
+
+  {% if error_message %}
+    <div class="alert alert-danger mt-3" role="alert">
+      {{ error_message }}
+    </div>
+  {% endif %}
+
+  <form method="post" class="mt-3">
     {% csrf_token %}
     <div class="mb-3">
       <label class="form-label">List Name</label>
@@ -16,14 +23,19 @@
 
     <div class="mb-3">
       <label class="form-label">Select Movies</label>
-      <div class="row">
+
+      <input type="text" id="movieSearch" class="form-control mb-3" placeholder="Search movies...">
+
+      <div class="row" id="movieList">
         {% for movie in movies %}
-          <div class="col-md-4">
+          <div class="col-md-4 mb-2 movie-item">
             <div class="form-check">
               <input class="form-check-input" type="checkbox" name="movies"
                      value="{{ movie.id }}" id="movie{{ movie.id }}"
                      {% if movie in list.movies.all %}checked{% endif %}>
-              <label class="form-check-label" for="movie{{ movie.id }}">{{ movie.title }}</label>
+              <label class="form-check-label" for="movie{{ movie.id }}">
+                {{ movie.title }}
+              </label>
             </div>
           </div>
         {% endfor %}
@@ -34,4 +46,16 @@
     <a href="{% url 'lists:list_detail' list.id %}" class="btn btn-secondary">Cancel</a>
   </form>
 </div>
+
+<script>
+document.getElementById('movieSearch').addEventListener('keyup', function() {
+  const query = this.value.toLowerCase();
+  const movies = document.querySelectorAll('#movieList .movie-item');
+
+  movies.forEach(movie => {
+    const label = movie.querySelector('label').textContent.toLowerCase();
+    movie.style.display = label.includes(query) ? '' : 'none';
+  });
+});
+</script>
 {% endblock %}

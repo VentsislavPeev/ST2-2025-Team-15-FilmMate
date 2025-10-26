@@ -10,21 +10,33 @@ def list_overview(request):
 
 @login_required
 def list_create(request):
+    movies = Movie.objects.all()
+    error_message = None 
+
     if request.method == 'POST':
-        name = request.POST.get('name')
-        description = request.POST.get('description')
+        name = request.POST.get('name', '').strip()
+        description = request.POST.get('description', '').strip()
         movie_ids = request.POST.getlist('movies')
 
-        new_list = List.objects.create(
-            user=request.user,
-            name=name,
-            description=description
-        )
-        new_list.movies.set(movie_ids)
-        return redirect('lists:list_overview')
+        if not name:
+            error_message = "List name cannot be empty."
+        elif List.objects.filter(user=request.user, name__iexact=name).exists():
+            error_message = "You already have a list with this name."
 
-    movies = Movie.objects.all()
-    return render(request, 'lists/list_create.html', {'movies': movies})
+        if not error_message:
+            new_list = List.objects.create(
+                user=request.user,
+                name=name,
+                description=description
+            )
+            new_list.movies.set(movie_ids)
+            return redirect('lists:list_overview')
+
+    return render(request, 'lists/list_create.html', {
+        'movies': movies,
+        'error_message': error_message,
+    })
+
 
 
 @login_required
@@ -51,18 +63,32 @@ def remove_movie(request, list_id, movie_id):
 def list_edit(request, pk):
     user_list = get_object_or_404(List, pk=pk, user=request.user)
     movies = Movie.objects.all()
+    error_message = None
 
     if request.method == 'POST':
-        user_list.name = request.POST.get('name')
-        user_list.description = request.POST.get('description')
+        name = request.POST.get('name', '').strip()
+        description = request.POST.get('description', '').strip()
         selected_movie_ids = request.POST.getlist('movies')
-        user_list.movies.set(selected_movie_ids)
-        user_list.save()
-        return redirect('lists:list_detail', pk=pk)
+
+        if not name:
+            error_message = "List name cannot be empty."
+        elif List.objects.filter(
+            user=request.user, name__iexact=name
+        ).exclude(pk=user_list.pk).exists():
+            error_message = "You already have another list with this name."
+
+        if not error_message:
+            user_list.name = name
+            user_list.description = description
+            user_list.movies.set(selected_movie_ids)
+            user_list.save()
+            return redirect('lists:list_detail', pk=pk)
 
     context = {
         'list': user_list,
         'movies': movies,
+        'error_message': error_message,
     }
     return render(request, 'lists/list_edit.html', context)
+
 
