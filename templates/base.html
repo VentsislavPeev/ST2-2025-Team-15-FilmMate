@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  {% load static %}  <!-- Add this line at the top -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}FilmMate{% endblock %}</title>
@@ -11,9 +12,10 @@
     rel="stylesheet"
   >
 
-  {% load static %}
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
 </head>
+
 <body class="bg-dark text-light d-flex flex-column min-vh-100">
 
   {% include 'partials/_navbar.html' %}

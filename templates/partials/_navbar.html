@@ -1,7 +1,13 @@
+{% load static %}
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary">
   <div class="container">
     <!-- Brand -->
-    <a class="navbar-brand fw-bold" href="{% url 'movies:home' %}">FilmMate</a>
+    <a class="navbar-brand d-flex align-items-center fw-bold" href="{% url 'movies:home' %}">
+     <img src="{% static 'images/favicon.ico' %}" alt="FilmMate Logo" width="60" height="60" class="me-2 rounded-circle">
+     FilmMate
+    </a>
+
 
     <!-- Mobile toggle -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
@@ -13,7 +19,7 @@
       <!-- Left links -->
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+           <a class="btn btn-outline-light ms-3 {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
              href="{% url 'movies:home' %}">
              Home
           </a>
@@ -47,7 +53,6 @@
               {% if request.user.profile_pic %}
                 <img src="{{ request.user.profile_pic.url }}" alt="{{ request.user.username }}" class="rounded-circle" width="36" height="36">
               {% else %}
-                <!-- SVG avatar placeholder -->
                 <svg class="rounded-circle bg-secondary" width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
                   <rect width="24" height="24" rx="12" fill="#6c757d" />
                   <path d="M12 12a3 3 0 100-6 3 3 0 000 6zm0 2c-3 0-5 1.5-5 3v1h10v-1c0-1.5-2-3-5-3z" fill="#fff"/>
@@ -58,6 +63,7 @@
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
               <li><a class="dropdown-item" href="#">Profile</a></li>
               <li><a class="dropdown-item" href="#">Settings</a></li>
+              <li><a class="dropdown-item" href="{% url 'lists:list_overview' %}">Lists</a></li>
               <li><hr class="dropdown-divider"></li>
               <li>
                 <form method="post" action="{% url 'users:logout' %}">
