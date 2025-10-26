@@ -23,7 +23,7 @@ def list_create(request):
         new_list.movies.set(movie_ids)
         return redirect('lists:list_overview')
 
-    movies = Movie.objects.all()[:20]
+    movies = Movie.objects.all()
     return render(request, 'lists/list_create.html', {'movies': movies})
 
 
