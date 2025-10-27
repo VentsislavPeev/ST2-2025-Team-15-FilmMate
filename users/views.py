@@ -143,7 +143,6 @@ def logout_view(request):
 @login_required
 def profile_view(request, user_id=None):
     """Show either the logged-in user's profile or another user's profile."""
-    # If no user_id, show the current user's profile
     if user_id is None:
         profile_user = request.user
     else:
@@ -155,19 +154,25 @@ def profile_view(request, user_id=None):
     watchlist_movies = watchlist.movies.all()[:4] if watchlist else []
     friends = profile_user.friends.all()
 
-    all_reviews_count = Review.objects.filter(user=profile_user).count()
     seen_movies_count = Review.objects.filter(user=profile_user).values_list('movie', flat=True).distinct().count()
+    all_reviews_count = Review.objects.filter(user=profile_user).count()
 
-    # Check if this is the current user's own profile
     is_own_profile = (profile_user == request.user)
-
-    # Check if already friends (for showing Add/Remove Friend button later)
     is_friend = request.user.friends.filter(pk=profile_user.pk).exists() if not is_own_profile else False
+
+    # **Check if the current user has already sent a friend request**
+    friend_request_sent = False
+    if not is_own_profile and not is_friend:
+        friend_request_sent = FriendRequest.objects.filter(
+            from_user=request.user,
+            to_user=profile_user
+        ).exists()
 
     context = {
         'profile_user': profile_user,
         'is_own_profile': is_own_profile,
         'is_friend': is_friend,
+        'friend_request_sent': friend_request_sent,  # <-- add this
         'recent_reviews': reviews,
         'recent_watchlist_movies': watchlist_movies,
         'friends': friends,

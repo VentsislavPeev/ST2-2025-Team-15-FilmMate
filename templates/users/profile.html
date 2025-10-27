@@ -24,7 +24,6 @@
       </div>
     </div>
 
-    <!-- Optional: Friend/Unfriend button -->
 {% if not is_own_profile %}
   <div class="mb-3">
     {% if is_friend %}
@@ -33,6 +32,8 @@
         <button class="btn btn-danger btn-sm">❌ Remove Friend</button>
       </form>
       <button class="btn btn-secondary btn-sm" disabled>✅ Friends</button>
+    {% elif friend_request_sent %}
+      <button class="btn btn-warning btn-sm" disabled>⏳ Request Sent</button>
     {% else %}
       <form method="post" action="{% url 'users:send_friend_request' profile_user.id %}">
         {% csrf_token %}
@@ -41,6 +42,7 @@
     {% endif %}
   </div>
 {% endif %}
+
 
 
     <!-- Recent Activity -->
