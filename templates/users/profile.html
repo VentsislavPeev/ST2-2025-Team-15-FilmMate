@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{{ user.username }}'s Profile</title>
+  <title>{{ profile_user.username }}'s Profile</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-dark text-light">
@@ -11,18 +11,32 @@
 
   <div class="container mt-4">
     <div class="d-flex align-items-center mb-4">
-      {% if user.profile_pic %}
-        <img src="{{ user.profile_pic.url }}" alt="{{ user.username }}" class="rounded-circle me-3" width="100" height="100">
+      {% if profile_user.profile_pic %}
+        <img src="{{ profile_user.profile_pic.url }}" alt="{{ profile_user.username }}" class="rounded-circle me-3" width="100" height="100">
       {% else %}
         <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width:100px; height:100px;">
-          <span class="fs-2 text-white">{{ user.username|slice:":1"|upper }}</span>
+          <span class="fs-2 text-white">{{ profile_user.username|slice:":1"|upper }}</span>
         </div>
       {% endif %}
       <div>
-        <h2 class="mb-0">{{ user.username }}</h2>
+        <h2 class="mb-0">{{ profile_user.username }}</h2>
         <p class="text-muted">{{ seen_movies_count }} films watched</p>
       </div>
     </div>
+
+    <!-- Optional: Friend/Unfriend button -->
+    {% if not is_own_profile %}
+      <div class="mb-3">
+        {% if is_friend %}
+          <button class="btn btn-secondary btn-sm" disabled>✅ Friends</button>
+        {% else %}
+          <form method="post" action="{% url 'users:send_friend_request' profile_user.id %}">
+            {% csrf_token %}
+            <button class="btn btn-primary btn-sm">➕ Add Friend</button>
+          </form>
+        {% endif %}
+      </div>
+    {% endif %}
 
     <!-- Recent Activity -->
     <h4 class="mt-4 mb-3">🎬 Recent Activity</h4>
@@ -59,7 +73,7 @@
           </div>
         </div>
       {% empty %}
-        <p class="text-muted">Your watchlist is empty.</p>
+        <p class="text-muted">This watchlist is empty.</p>
       {% endfor %}
     </div>
 
@@ -68,16 +82,21 @@
     <div class="row">
       {% for friend in friends %}
         <div class="col-md-3 mb-3 text-center">
-          <a href="{% url 'users:profile' friend.id %}" class="text-decoration-none text-light">
-            {% if friend.profile_pic %}
-              <img src="{{ friend.profile_pic.url }}" class="rounded-circle mb-2" width="80" height="80">
-            {% else %}
-              <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-2" style="width:80px; height:80px;">
-                <span class="fs-4 text-white">{{ friend.username|slice:":1"|upper }}</span>
-              </div>
-            {% endif %}
-            <p>{{ friend.username }}</p>
-          </a>
+          {% if friend.id == request.user.id %}
+            <!-- Link to your own profile -->
+            <a href="{% url 'users:profile' %}" class="text-decoration-none text-light">
+          {% else %}
+            <a href="{% url 'users:profile_other' friend.id %}" class="text-decoration-none text-light">
+          {% endif %}
+              {% if friend.profile_pic %}
+                <img src="{{ friend.profile_pic.url }}" class="rounded-circle mb-2" width="80" height="80" alt="{{ friend.username }}">
+              {% else %}
+                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-2" style="width:80px; height:80px;">
+                  <span class="fs-4 text-white">{{ friend.username|slice:":1"|upper }}</span>
+                </div>
+              {% endif %}
+              <p>{{ friend.username }}</p>
+            </a>
         </div>
       {% empty %}
         <p class="text-muted">No friends yet.</p>

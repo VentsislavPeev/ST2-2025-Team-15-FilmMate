@@ -122,18 +122,33 @@ def logout_view(request):
     return redirect(LOGIN_REDIRECT_URL)
 
 @login_required
-def profile_view(request):
-    user = request.user
-    reviews = Review.objects.filter(user=user).select_related('movie')[:4]
-    watchlist = List.objects.filter(user=user, name__icontains="watchlist").first()
-    watchlist_movies = watchlist.movies.all()[:4] if watchlist else []
-    friends = user.friends.all()
+def profile_view(request, user_id=None):
+    """Show either the logged-in user's profile or another user's profile."""
+    # If no user_id, show the current user's profile
+    if user_id is None:
+        profile_user = request.user
+    else:
+        profile_user = get_object_or_404(CustomUser, pk=user_id)
 
-    all_reviews_count = Review.objects.filter(user=user).count()
-    seen_movies_count = Review.objects.filter(user=user).values_list('movie', flat=True).distinct().count()
+    # Shared data
+    reviews = Review.objects.filter(user=profile_user).select_related('movie')[:4]
+    watchlist = List.objects.filter(user=profile_user, name__icontains="watchlist").first()
+    watchlist_movies = watchlist.movies.all()[:4] if watchlist else []
+    friends = profile_user.friends.all()
+
+    all_reviews_count = Review.objects.filter(user=profile_user).count()
+    seen_movies_count = Review.objects.filter(user=profile_user).values_list('movie', flat=True).distinct().count()
+
+    # Check if this is the current user's own profile
+    is_own_profile = (profile_user == request.user)
+
+    # Check if already friends (for showing Add/Remove Friend button later)
+    is_friend = request.user.friends.filter(pk=profile_user.pk).exists() if not is_own_profile else False
 
     context = {
-        'user': user,
+        'profile_user': profile_user,  # renamed to avoid confusion
+        'is_own_profile': is_own_profile,
+        'is_friend': is_friend,
         'recent_reviews': reviews,
         'recent_watchlist_movies': watchlist_movies,
         'friends': friends,
