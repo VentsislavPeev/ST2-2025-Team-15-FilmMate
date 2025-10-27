@@ -5,10 +5,12 @@ from django.views.decorators.http import require_POST
 from django.http import HttpResponseForbidden
 from django.urls import reverse
 from django.contrib import messages
-
 from users.forms import CustomUserCreationForm, CustomAuthenticationForm
 from users.models import FriendRequest, CustomUser
 from filmmate.settings import LOGIN_REDIRECT_URL
+from movies.models import Movie
+from reviews.models import Review
+from lists.models import List
 
 def signup_view(request):
     if request.method == 'POST':
@@ -118,3 +120,24 @@ def cancel_friend_request(request, fr_id):
 def logout_view(request):
     logout(request)
     return redirect(LOGIN_REDIRECT_URL)
+
+@login_required
+def profile_view(request):
+    user = request.user
+    reviews = Review.objects.filter(user=user).select_related('movie')[:4]
+    watchlist = List.objects.filter(user=user, name__icontains="watchlist").first()
+    watchlist_movies = watchlist.movies.all()[:4] if watchlist else []
+    friends = user.friends.all()
+
+    all_reviews_count = Review.objects.filter(user=user).count()
+    seen_movies_count = Review.objects.filter(user=user).values_list('movie', flat=True).distinct().count()
+
+    context = {
+        'user': user,
+        'recent_reviews': reviews,
+        'recent_watchlist_movies': watchlist_movies,
+        'friends': friends,
+        'seen_movies_count': seen_movies_count,
+        'all_reviews_count': all_reviews_count,
+    }
+    return render(request, 'users/profile.html', context)

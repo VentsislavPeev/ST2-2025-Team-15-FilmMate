@@ -10,4 +10,5 @@ urlpatterns = [
     path('<int:pk>/edit/', views.list_edit, name='list_edit'),
     path('<int:pk>/delete/', views.list_delete, name='list_delete'),
     path('<int:list_id>/remove-movie/<int:movie_id>/', views.remove_movie, name='remove_movie'),
+    path('add-to-watchlist/<int:movie_id>/', views.add_to_watchlist, name='add_to_watchlist'),
 ]

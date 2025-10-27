@@ -76,14 +76,23 @@
             <div>
               <!-- TODO: Make the buttons functional -->
               {% if request.user.is_authenticated %}
-                <form method="post" action="#" class="d-inline me-2">
-                  {% csrf_token %}
-                  <button class="btn btn-outline-light btn-sm">Add to Watchlist</button>
-                </form>
-                <a href="#" class="btn btn-primary btn-sm">Write a Review</a>
-              {% else %}
-                <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-primary btn-sm">Login to review</a>
-              {% endif %}
+    <form method="post" action="{% url 'movies:movie_detail' movie.id %}" class="d-inline me-2">
+        {% csrf_token %}
+        {% if in_watchlist %}
+            <button type="submit" class="btn btn-success btn-sm">
+                ✅ Added to Watchlist
+            </button>
+        {% else %}
+            <button type="submit" class="btn btn-outline-light btn-sm">
+                ➕ Add to Watchlist
+            </button>
+        {% endif %}
+    </form>
+    <a href="#" class="btn btn-primary btn-sm">Write a Review</a>
+{% else %}
+    <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-primary btn-sm">Login to review</a>
+{% endif %}
+
               
             </div>
           </div>
