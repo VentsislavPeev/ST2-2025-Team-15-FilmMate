@@ -25,18 +25,23 @@
     </div>
 
     <!-- Optional: Friend/Unfriend button -->
-    {% if not is_own_profile %}
-      <div class="mb-3">
-        {% if is_friend %}
-          <button class="btn btn-secondary btn-sm" disabled>✅ Friends</button>
-        {% else %}
-          <form method="post" action="{% url 'users:send_friend_request' profile_user.id %}">
-            {% csrf_token %}
-            <button class="btn btn-primary btn-sm">➕ Add Friend</button>
-          </form>
-        {% endif %}
-      </div>
+{% if not is_own_profile %}
+  <div class="mb-3">
+    {% if is_friend %}
+      <form method="post" action="{% url 'users:remove_friend' profile_user.id %}" class="d-inline">
+        {% csrf_token %}
+        <button class="btn btn-danger btn-sm">❌ Remove Friend</button>
+      </form>
+      <button class="btn btn-secondary btn-sm" disabled>✅ Friends</button>
+    {% else %}
+      <form method="post" action="{% url 'users:send_friend_request' profile_user.id %}">
+        {% csrf_token %}
+        <button class="btn btn-primary btn-sm">➕ Add Friend</button>
+      </form>
     {% endif %}
+  </div>
+{% endif %}
+
 
     <!-- Recent Activity -->
     <h4 class="mt-4 mb-3">🎬 Recent Activity</h4>
@@ -83,10 +88,9 @@
       {% for friend in friends %}
         <div class="col-md-3 mb-3 text-center">
           {% if friend.id == request.user.id %}
-            <!-- Link to your own profile -->
-            <a href="{% url 'users:profile' %}" class="text-decoration-none text-light">
+            <a href="{% url 'users:profile' %}" class="text-decoration-none text-light d-inline-block">
           {% else %}
-            <a href="{% url 'users:profile_other' friend.id %}" class="text-decoration-none text-light">
+            <a href="{% url 'users:profile_other' friend.id %}" class="text-decoration-none text-light d-inline-block">
           {% endif %}
               {% if friend.profile_pic %}
                 <img src="{{ friend.profile_pic.url }}" class="rounded-circle mb-2" width="80" height="80" alt="{{ friend.username }}">
@@ -95,7 +99,7 @@
                   <span class="fs-4 text-white">{{ friend.username|slice:":1"|upper }}</span>
                 </div>
               {% endif %}
-              <p>{{ friend.username }}</p>
+              <p class="mb-0">{{ friend.username }}</p>
             </a>
         </div>
       {% empty %}
