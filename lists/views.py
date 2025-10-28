@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from users.models import CustomUser  # ✅ Import this for user lookups
 from .models import List
 from movies.models import Movie
 
@@ -99,3 +100,23 @@ def add_to_watchlist(request, movie_id):
     watchlist, created = List.objects.get_or_create(user=request.user, name="Watchlist")
     watchlist.movies.add(movie)
     return redirect('movies:movie_detail', pk=movie.id)
+
+# ✅ NEW VIEW: Watchlist Page
+@login_required
+def watchlist_view(request, user_id=None):
+    """Display the full watchlist for a user."""
+    if user_id is None:
+        user = request.user
+    else:
+        user = get_object_or_404(CustomUser, pk=user_id)
+
+    watchlist = List.objects.filter(user=user, name__icontains="watchlist").first()
+    watchlist_movies = watchlist.movies.all() if watchlist else []
+    is_own_profile = (user == request.user)
+
+    context = {
+        'watchlist_owner': user,
+        'watchlist_movies': watchlist_movies,
+        'is_own_profile': is_own_profile,
+    }
+    return render(request, 'lists/watchlist_page.html', context)

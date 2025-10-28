@@ -34,6 +34,8 @@
         </li>
       </ul>
 
+
+
       <!-- Search bar -->
       <form class="d-flex" method="get" action="{% url 'movies:movie_search' %}">
         <input
@@ -48,6 +50,7 @@
       <!-- Right side: auth actions -->
       <ul class="navbar-nav ms-3 mb-2 mb-lg-0">
         {% if request.user.is_authenticated %}
+          <!-- User dropdown -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               {% if request.user.profile_pic %}
@@ -60,18 +63,28 @@
               {% endif %}
               <span class="ms-2 d-none d-lg-inline">{{ request.user.username }}</span>
             </a>
+
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-              <a class="dropdown-item" href="{% url 'users:profile' %}">Profile</a>
-              <li><a class="dropdown-item" href="#">Settings</a></li>
+              <li><a class="dropdown-item" href="{% url 'users:profile' %}">👤 Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+
+              <!-- Extra navigation inside dropdown -->
+              <li><a class="dropdown-item" href="#">🎥 My Films</a></li>
+              <li><a class="dropdown-item" href="#">📝 My Reviews</a></li>
+              <li><a class="dropdown-item" href="{% url 'lists:watchlist_page' request.user.id %}">📺 Watchlist</a></li>
+              <li><a class="dropdown-item" href="{% url 'lists:list_overview' %}">📚 My Lists</a></li>
+              <li><a class="dropdown-item" href="{% url 'users:friend_requests' %}">👥 Friend Requests</a></li>
+
               <li><hr class="dropdown-divider"></li>
               <li>
                 <form method="post" action="{% url 'users:logout' %}">
                   {% csrf_token %}
-                  <button type="submit" class="dropdown-item">Log out</button>
+                  <button type="submit" class="dropdown-item text-danger">🚪 Log out</button>
                 </form>
               </li>
             </ul>
           </li>
+
         {% else %}
           <li class="nav-item">
             <a class="btn btn-outline-light ms-2" href="{% url 'users:login' %}">Log in</a>
@@ -81,4 +94,3 @@
     </div>
   </div>
 </nav>
-
