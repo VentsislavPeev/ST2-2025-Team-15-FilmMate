@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}{{ watchlist_owner.username }}'s Watchlist{% endblock %}
+{% block content %}
+
+<div class="container mt-4">
+  <h2 class="mb-4">📺 {{ watchlist_owner.username }}'s Watchlist</h2>
+
+  {% if watchlist_movies %}
+    <div class="row">
+      {% for movie in watchlist_movies %}
+        <div class="col-md-3 mb-3">
+          <div class="card bg-secondary text-light h-100">
+            <a href="{% url 'movies:movie_detail' movie.id %}" class="text-decoration-none text-light">
+              {% if movie.poster %}
+                <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}">
+              {% endif %}
+              <div class="card-body">
+                <h6 class="card-title">{{ movie.title }}</h6>
+              </div>
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">This watchlist is empty.</p>
+  {% endif %}
+</div>
+
+<div class="mt-4">
+    <a href="{% url 'users:profile' %}" class="btn btn-secondary">
+      ← Back to My Profile
+    </a>
+  </div>
+  
+{% endblock %}

@@ -29,13 +29,14 @@
         <div class="col-md-3 mb-4">
           <div class="card h-100 shadow-sm border-0">
             <a href="{% url 'movies:movie_detail' movie.id %}" class="text-decoration-none text-dark">
-              {% if movie.poster_url %}
-                <img src="{{ movie.poster_url }}" class="card-img-top rounded-top" alt="{{ movie.title }}">
-              {% else %}
-                <div class="bg-secondary d-flex align-items-center justify-content-center text-white" style="height: 250px;">
-                  <span>No Poster</span>
-                </div>
-              {% endif %}
+              {% if movie.poster %}
+  <img src="{{ movie.poster.url }}" class="card-img-top rounded-top" alt="{{ movie.title }}">
+{% else %}
+  <div class="bg-secondary d-flex align-items-center justify-content-center text-white" style="height: 250px;">
+    <span>No Poster</span>
+  </div>
+{% endif %}
+
               <div class="card-body d-flex flex-column">
                 <h6 class="card-title mb-1">{{ movie.title }}</h6>
                 {% if movie.year %}

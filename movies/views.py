@@ -1,8 +1,9 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.core.paginator import Paginator
 from movies.models import Movie
 from genres.models import Genre
-
+from lists.models import List
+from django.contrib.auth.decorators import login_required
 
 def movie_home(request):
     popular_films = Movie.objects.all()[7:14] 
@@ -38,8 +39,30 @@ def movie_search(request):
     return render(request, 'movies/home.html', context)
 
 def movie_detail(request, pk):
+    """Show movie details + reviews + toggle watchlist with a single button."""
     movie = get_object_or_404(Movie, pk=pk)
-    return render(request, 'movies/movie_detail.html', {'movie': movie})
+    reviews = movie.review_set.all().order_by('-date')
+
+    # Get or create the user's Watchlist
+    watchlist, _ = List.objects.get_or_create(user=request.user, name="Watchlist")
+
+    # Check if the movie is currently in the watchlist
+    in_watchlist = movie in watchlist.movies.all()
+
+    if request.method == 'POST':
+        # Toggle the movie in the watchlist
+        if in_watchlist:
+            watchlist.movies.remove(movie)
+        else:
+            watchlist.movies.add(movie)
+        return redirect('movies:movie_detail', pk=pk)  # Reload page to update button
+
+    context = {
+        'movie': movie,
+        'reviews': reviews,
+        'in_watchlist': in_watchlist,
+    }
+    return render(request, 'movies/movie_detail.html', context)
 
 def movies_all(request):
     query = request.GET.get('q', '')
