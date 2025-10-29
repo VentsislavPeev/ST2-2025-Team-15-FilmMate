@@ -54,8 +54,6 @@ class Command(BaseCommand):
             except Exception as e:
                 self.stdout.write(self.style.WARNING(f"Failed to fetch director for {title}: {e}"))
 
-            poster_url_to_save = None 
-
             if poster_path:
                 poster_url_to_save = f"{TMDB_IMAGE_BASE}{poster_path}"
             else:
