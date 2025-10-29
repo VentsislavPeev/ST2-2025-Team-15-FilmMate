@@ -18,7 +18,7 @@
         <div class="film-card flex-shrink-0" style="width: 160px;">
           <a href="{% url 'movies:movie_detail' film.id %}" class="text-decoration-none text-light">
             {% if film.poster %}
-                <img src="{{ film.poster.url }}" class="img-fluid rounded shadow-sm poster" alt="{{ film.title }}">
+                <img src="{{ film.poster}}" class="img-fluid rounded shadow-sm poster" alt="{{ film.title }}">
             {% elif film.poster_url %}
                 <img src="{{ film.poster_url }}" class="img-fluid rounded shadow-sm poster" alt="{{ film.title }}">
             {% else %}
