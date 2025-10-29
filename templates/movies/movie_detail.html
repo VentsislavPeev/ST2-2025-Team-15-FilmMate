@@ -76,7 +76,7 @@
             <div>
               <!-- TODO: Make the buttons functional -->
               {% if request.user.is_authenticated %}
-    <form method="post" action="{% url 'movies:movie_detail' movie.id %}" class="d-inline me-2">
+              <form method="post" action="{% url 'movies:movie_detail' movie.id %}" class="d-inline me-2">
         {% csrf_token %}
         {% if in_watchlist %}
             <button type="submit" class="btn btn-success btn-sm">
