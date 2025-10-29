@@ -8,7 +8,6 @@ from django.contrib import messages
 from users.forms import CustomUserCreationForm, CustomAuthenticationForm
 from users.models import FriendRequest, CustomUser
 from filmmate.settings import LOGIN_REDIRECT_URL
-from movies.models import Movie
 from reviews.models import Review
 from lists.models import List
 
