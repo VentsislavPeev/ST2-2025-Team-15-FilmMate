@@ -48,7 +48,7 @@
         <div class="card bg-secondary text-light h-100">
           <a href="{% url 'movies:movie_detail' review.movie.id %}" class="text-decoration-none text-light">
             {% if review.movie.poster %}
-              <img src="{{ review.movie.poster.url }}" class="card-img-top" alt="{{ review.movie.title }}">
+              <img src="{{ review.movie.poster }}" class="card-img-top" alt="{{ review.movie.title }}">
             {% endif %}
             <div class="card-body">
               <h6 class="card-title">{{ review.movie.title }}</h6>
@@ -75,7 +75,7 @@
         <div class="card bg-secondary text-light h-100">
           <a href="{% url 'movies:movie_detail' movie.id %}" class="text-decoration-none text-light">
             {% if movie.poster %}
-              <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}">
+              <img src="{{ movie.poster }}" class="card-img-top" alt="{{ movie.title }}">
             {% endif %}
             <div class="card-body">
               <h6 class="card-title">{{ movie.title }}</h6>
