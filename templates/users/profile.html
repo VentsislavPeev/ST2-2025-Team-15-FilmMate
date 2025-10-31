@@ -7,11 +7,11 @@
   <div class="d-flex align-items-center mb-4">
     {% if profile_user.profile_pic %}
       <img src="{{ profile_user.profile_pic.url }}" alt="{{ profile_user.username }}"
-           class="rounded-circle me-3" width="100" height="100">
+           class="rounded-circle me-5" width="100" height="100">
     {% else %}
-      <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center"
+      <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-5"
            style="width:100px; height:100px;">
-        <span class="fs-2 text-white">{{ profile_user.username|slice:":1"|upper }}</span>
+        <span class="fs-2 ml-2 text-white">{{ profile_user.username|slice:":1"|upper }}</span>
       </div>
     {% endif %}
     <div>
@@ -19,6 +19,8 @@
       <p class="text-muted mb-0">{{ seen_movies_count }} films watched</p>
     </div>
   </div>
+</div>
+
 
   <!-- Friend Buttons -->
   {% if not is_own_profile %}
