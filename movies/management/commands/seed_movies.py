@@ -54,36 +54,18 @@ class Command(BaseCommand):
             except Exception as e:
                 self.stdout.write(self.style.WARNING(f"Failed to fetch director for {title}: {e}"))
 
-            # Create movie
+            if poster_path:
+                poster_url_to_save = f"{TMDB_IMAGE_BASE}{poster_path}"
+            else:
+                poster_url_to_save = settings.DEFAULT_POSTER_URL
+
             movie = Movie.objects.create(
                 title=title,
                 year=year,
                 director=director,
                 description=description,
+                poster=poster_url_to_save
             )
-
-            # Add poster if available
-            if poster_path:
-                poster_url = f"{TMDB_IMAGE_BASE}{poster_path}"
-                try:
-                    response = requests.get(poster_url)
-                    if response.status_code == 200:
-                        movie.poster.save(
-                            f"{title.replace(' ', '_')}.jpg",
-                            ContentFile(response.content),
-                            save=True
-                        )
-                except Exception as e:
-                    self.stdout.write(self.style.WARNING(f"Failed to download poster for {title}: {e}"))
-            else:
-                # Default poster fallback
-                if os.path.exists(DEFAULT_POSTER_PATH):
-                    with open(DEFAULT_POSTER_PATH, 'rb') as f:
-                        movie.poster.save(
-                            f"default_{title.replace(' ', '_')}.jpg",
-                            ContentFile(f.read()),
-                            save=True
-                        )
 
             # Add genres
             for genre_id in genre_ids:

@@ -173,3 +173,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+DEFAULT_POSTER_URL="/static/images/default-image.jpg"
+TMDB_API_KEY = os.getenv("TMDB_API_KEY")
+TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w500' 

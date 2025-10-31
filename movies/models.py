@@ -8,7 +8,7 @@ class Movie(models.Model):
     genres = models.ManyToManyField('genres.Genre', related_name='movie_genres')
     lists = models.ManyToManyField('lists.List', related_name='movie_lists')
 
-    poster = models.ImageField(upload_to='posters/')
+    poster = models.URLField(max_length=255, blank=True, null=True)
     description = models.TextField()
     # Average rating computed from user reviews. Default 0.0 when no reviews.
     rating = models.FloatField(default=0.0)

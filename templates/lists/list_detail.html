@@ -30,7 +30,7 @@
           <div class="card h-100 shadow-sm border-0">
             <a href="{% url 'movies:movie_detail' movie.id %}" class="text-decoration-none text-dark">
               {% if movie.poster %}
-  <img src="{{ movie.poster.url }}" class="card-img-top rounded-top" alt="{{ movie.title }}">
+  <img src="{{ movie.poster }}" class="card-img-top rounded-top" alt="{{ movie.title }}">
 {% else %}
   <div class="bg-secondary d-flex align-items-center justify-content-center text-white" style="height: 250px;">
     <span>No Poster</span>
