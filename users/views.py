@@ -186,6 +186,8 @@ def profile_view(request, user_id=None):
 
 def username_autocomplete(request):
     query = request.GET.get('q', '')
+    if len(query) < 2:
+        return JsonResponse([], safe=False)
     users = User.objects.filter(username__icontains=query)[:5]  
     results = list(users.values_list('username', flat=True))
     return JsonResponse(results, safe=False)
