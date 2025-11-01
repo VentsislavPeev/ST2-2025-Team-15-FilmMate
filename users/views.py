@@ -184,6 +184,7 @@ def profile_view(request, user_id=None):
     }
     return render(request, 'users/profile.html', context)
 
+@login_required
 def username_autocomplete(request):
     query = request.GET.get('q', '')
     users = User.objects.filter(username__icontains=query)[:5]  
