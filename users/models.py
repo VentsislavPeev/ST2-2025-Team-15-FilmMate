@@ -21,6 +21,7 @@ class FriendRequest(models.Model):
     to_user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='received_friend_requests', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
 
+       
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['from_user', 'to_user'], name='unique_friend_request')
