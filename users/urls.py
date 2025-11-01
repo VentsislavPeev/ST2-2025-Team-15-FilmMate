@@ -16,4 +16,5 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),  # your own profile
     path('profile/<int:user_id>/', views.profile_view, name='profile_other'),  # other users' profiles
     path('remove_friend/<int:user_id>/', views.remove_friend, name='remove_friend'),
+    path('autocomplete/', views.username_autocomplete, name='username_autocomplete'),
 ]

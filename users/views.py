@@ -10,6 +10,10 @@ from users.models import FriendRequest, CustomUser
 from filmmate.settings import LOGIN_REDIRECT_URL
 from reviews.models import Review
 from lists.models import List
+from django.http import JsonResponse
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 def signup_view(request):
     if request.method == 'POST':
@@ -171,7 +175,7 @@ def profile_view(request, user_id=None):
         'profile_user': profile_user,
         'is_own_profile': is_own_profile,
         'is_friend': is_friend,
-        'friend_request_sent': friend_request_sent,  # <-- add this
+        'friend_request_sent': friend_request_sent, 
         'recent_reviews': reviews,
         'recent_watchlist_movies': watchlist_movies,
         'friends': friends,
@@ -179,3 +183,12 @@ def profile_view(request, user_id=None):
         'all_reviews_count': all_reviews_count,
     }
     return render(request, 'users/profile.html', context)
+
+@login_required
+def username_autocomplete(request):
+    query = request.GET.get('q', '')
+    if len(query) < 2:
+        return JsonResponse([], safe=False)
+    users = User.objects.filter(username__icontains=query)[:5]  
+    results = list(users.values_list('username', flat=True))
+    return JsonResponse(results, safe=False)

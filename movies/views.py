@@ -4,16 +4,28 @@ from movies.models import Movie
 from genres.models import Genre
 from lists.models import List
 from django.contrib.auth.decorators import login_required
+from users.models import FriendRequest
+
 
 def movie_home(request):
-    popular_films = Movie.objects.all()[7:14] 
-    friend_activities = [] 
+    popular_films = Movie.objects.all()[7:14]
+    friend_activities = []
+
+    pending_requests = []
+    if request.user.is_authenticated:
+        pending_requests = (
+            FriendRequest.objects.filter(to_user=request.user)
+            .select_related('from_user')
+            .order_by('-created')
+        )
 
     context = {
         'popular_films': popular_films,
         'friend_activities': friend_activities,
+        'pending_requests': pending_requests,
     }
     return render(request, 'movies/home.html', context)
+
 
 def movie_list(request):
     movies = Movie.objects.all()

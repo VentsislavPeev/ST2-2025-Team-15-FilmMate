@@ -4,6 +4,69 @@
 
 {% block content %}
 
+{% if pending_requests %}
+  {% for request in pending_requests %}
+    <div 
+      style="
+        position: fixed;
+        top: 60px;
+        right: 40px;
+        background: rgba(25, 25, 25, 0.97);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        width: 320px;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+        z-index: 1050;
+        animation: fadeIn 0.4s ease-in-out;
+      "
+      class="friend-request-popup"
+    >
+      <div class="d-flex align-items-center mb-2">
+        {% if request.from_user.profile_pic %}
+          <img src="{{ request.from_user.profile_pic.url }}"
+               alt="{{ request.from_user.username }}"
+               class="rounded-circle me-2"
+               width="50" height="50">
+        {% else %}
+          <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center"
+               style="width:50px; height:50px;">
+            <span class="text-white fw-bold">{{ request.from_user.username|slice:":1"|upper }}</span>
+          </div>
+        {% endif %}
+        <strong class="ms-2">{{ request.from_user.username }}</strong>
+      </div>
+
+      <p class="small mb-3">sent you a friend request!</p>
+
+      <div class="d-flex justify-content-between">
+        <form method="post" action="{% url 'users:accept_friend_request' request.id %}">
+          {% csrf_token %}
+          <button class="btn btn-success btn-sm">Accept</button>
+        </form>
+
+        <form method="post" action="{% url 'users:decline_friend_request' request.id %}">
+          {% csrf_token %}
+          <button class="btn btn-danger btn-sm">Decline</button>
+        </form>
+
+        <button class="btn btn-secondary btn-sm"
+                onclick="this.parentElement.parentElement.style.display='none';">
+          Close
+        </button>
+      </div>
+    </div>
+  {% endfor %}
+{% endif %}
+
+<style>
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(-10px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+</style>
+
+
 <div class="container py-4">
 
   <!-- POPULAR THIS WEEK -->
