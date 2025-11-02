@@ -1,6 +1,6 @@
 # movies/management/commands/seed_movies.py
 from django.core.management.base import BaseCommand
-from movies.factories import MovieFactory
+from ...factories import MovieFactory
 import tmdbsimple as tmdb
 import os
 

@@ -133,4 +133,14 @@
 
       This mimics how observers “unsubscribe” after handling an event.
 
-3. 
+3. Factory Pattern in Movie Creation
+
+We implemented the Factory Pattern via a MovieFactory class to centralize the creation of Movie objects from external API data.
+
+Why:
+
+Keeps object creation logic clean and reusable.
+
+Ensures consistent handling of genres, directors, and posters.
+
+Makes it easy to change how movies are created without touching the seeding command.
