@@ -1,18 +1,13 @@
+# movies/management/commands/seed_movies.py
 from django.core.management.base import BaseCommand
-from movies.models import Movie
-from genres.models import Genre
+from ...factories import MovieFactory
 import tmdbsimple as tmdb
-import requests
-from django.core.files.base import ContentFile
-from django.conf import settings
 import os
 
 tmdb.API_KEY = os.getenv("TMDB_API_KEY")
-TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w500'  # Base URL for poster images
-DEFAULT_POSTER_PATH = os.path.join(settings.BASE_DIR, 'static', 'images', 'default-image.jpg')
 
 class Command(BaseCommand):
-    help = "Seed movies and genres from TMDb API with director and poster"
+    help = "Seed movies and genres from TMDb API using MovieFactory"
 
     def handle(self, *args, **options):
         # Get TMDb genre mapping once
@@ -30,7 +25,6 @@ class Command(BaseCommand):
             return
 
         for item in popular_movies:
-            # Safe defaults
             title = item.get('title') or 'Untitled Movie'
             release_date = item.get('release_date') or ''
             year = int(release_date[:4]) if release_date else 0
@@ -38,12 +32,7 @@ class Command(BaseCommand):
             genre_ids = item.get('genre_ids', [])
             poster_path = item.get('poster_path')
 
-            # ✅ Skip if movie already exists
-            if Movie.objects.filter(title=title).exists():
-                self.stdout.write(self.style.NOTICE(f"Movie '{title}' already exists. Skipping."))
-                continue
-
-            # Get director from credits
+            # Get director name
             director = 'Unknown'
             try:
                 credits = tmdb.Movies(item['id']).credits()
@@ -54,23 +43,18 @@ class Command(BaseCommand):
             except Exception as e:
                 self.stdout.write(self.style.WARNING(f"Failed to fetch director for {title}: {e}"))
 
-            if poster_path:
-                poster_url_to_save = f"{TMDB_IMAGE_BASE}{poster_path}"
-            else:
-                poster_url_to_save = settings.DEFAULT_POSTER_URL
-
-            movie = Movie.objects.create(
+            # Create movie via factory
+            movie = MovieFactory.create_movie(
                 title=title,
                 year=year,
                 director=director,
                 description=description,
-                poster=poster_url_to_save
+                genre_ids=genre_ids,
+                genre_list=genre_list,
+                poster_path=poster_path
             )
 
-            # Add genres
-            for genre_id in genre_ids:
-                name = next((g['name'] for g in genre_list if g['id'] == genre_id), None) or 'Unknown'
-                genre_obj, _ = Genre.objects.get_or_create(name=name)
-                movie.genres.add(genre_obj)
-
-            self.stdout.write(self.style.SUCCESS(f"Movie '{movie.title}' added."))
+            if movie:
+                self.stdout.write(self.style.SUCCESS(f"Movie '{movie.title}' added."))
+            else:
+                self.stdout.write(self.style.NOTICE(f"Movie '{title}' already exists. Skipping."))
