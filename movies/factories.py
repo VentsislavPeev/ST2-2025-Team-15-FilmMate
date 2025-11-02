@@ -33,8 +33,9 @@ class MovieFactory:
         )
 
         # Assign genres from TMDb genre mapping
+        genre_map = {g['id']: g['name'] for g in genre_list}
         for genre_id in genre_ids:
-            name = next((g['name'] for g in genre_list if g['id'] == genre_id), None) or 'Unknown'
+            name = genre_map.get(genre_id, 'Unknown')
             genre_obj, _ = Genre.objects.get_or_create(name=name)
             movie.genres.add(genre_obj)
 
