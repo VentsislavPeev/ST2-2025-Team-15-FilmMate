@@ -13,14 +13,13 @@
   >
 
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
-  <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
 </head>
 
 <body class="bg-dark text-light d-flex flex-column min-vh-100">
 
   {% include 'partials/_navbar.html' %}
 
-  <main class="container my-3 flex-grow-1">
+  <main class="container flex-grow-1" style="padding-top: 90px; margin-bottom: 1rem;">
     {% block content %}{% endblock %}
   </main>
 

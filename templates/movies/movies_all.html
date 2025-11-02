@@ -4,110 +4,117 @@
 
 {% block content %}
 <div class="container py-4">
-  <h2 class="text-light mb-4 fw-bold">All Movies</h2>
 
-  <!-- Search + Filters -->
-  <form method="get" class="row g-2 mb-4">
-    <div class="col-md-4">
-      <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search movies...">
-    </div>
+  <div class="row justify-content-center">
+    <div class="col-lg-11 col-xl-10">
 
-    <!-- Genre Dropdown -->
-    <div class="col-md-3">
-      <select name="genre" class="form-select">
-        <option value="">All Genres</option>
-        {% for g in genres %}
-          <option value="{{ g.name }}" {% if genre_filter == g.name %}selected{% endif %}>{{ g.name }}</option>
-        {% endfor %}
-      </select>
-    </div>
+      <h2 class="text-light mb-4 fw-bold">All Movies</h2>
 
-    <div class="col-md-3">
-      <select name="sort" class="form-select">
-        <option value="title" {% if sort == 'title' %}selected{% endif %}>Sort by Title</option>
-        <option value="year" {% if sort == 'year' %}selected{% endif %}>Sort by Year</option>
-        <option value="director" {% if sort == 'director' %}selected{% endif %}>Sort by Director</option>
-      </select>
-    </div>
+      <form method="get" class="row g-2 mb-4">
+        <div class="col-md-4">
+          <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search movies...">
+        </div>
 
-    <div class="col-md-2">
-      <button class="btn btn-primary w-100" type="submit">Apply</button>
-    </div>
-  </form>
+        <div class="col-md-3">
+          <select name="genre" class="form-select">
+            <option value="">All Genres</option>
+            {% for g in genres %}
+            <option value="{{ g.name }}" {% if genre_filter == g.name %}selected{% endif %}>{{ g.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
 
-  <!-- Movie Grid -->
-  <div class="row row-cols-2 row-cols-md-4 g-4">
-    {% for movie in page_obj %}
-      <div class="col">
-        <div class="card bg-dark text-light h-100 border-secondary">
-          <a href="{% url 'movies:movie_detail' movie.id %}" class="text-decoration-none">
-            {% if movie.poster %}
+        <div class="col-md-3">
+          <select name="sort" class="form-select">
+            <option value="title" {% if sort == 'title' %}selected{% endif %}>Sort by Title</option>
+            <option value="year" {% if sort == 'year' %}selected{% endif %}>Sort by Year</option>
+            <option value="director" {% if sort == 'director' %}selected{% endif %}>Sort by Director</option>
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <button class="btn btn-primary w-100" type="submit">Apply</button>
+        </div>
+      </form>
+
+      <div class="row row-cols-2 row-cols-md-4 g-4">
+        {% for movie in page_obj %}
+        <div class="col">
+          <div class="card bg-dark text-light h-100 border-secondary">
+            <a href="{% url 'movies:movie_detail' movie.id %}" class="text-decoration-none">
+              {% if movie.poster %}
               <img src="{{ movie.poster }}" class="card-img-top" alt="{{ movie.title }}">
-            {% else %}
+              {% else %}
               <img src="{% static 'images/default_poster.jpg' %}" class="card-img-top" alt="No poster available">
-            {% endif %}
-          </a>
-          <div class="card-body">
-            <h6 class="card-title">{{ movie.title }}</h6>
-            <p class="card-text small text-muted mb-1">{{ movie.director }}</p>
-            <p class="card-text small">{{ movie.year }}</p>
+              {% endif %}
+            </a>
+            <div class="card-body">
+              <h6 class="card-title">{{ movie.title }}</h6>
+              <p class="card-text small text-muted mb-1">{{ movie.director }}</p>
+              <p class="card-text small">{{ movie.year }}</p>
+            </div>
           </div>
         </div>
+        {% empty %}
+        <p class="text-light">No movies found.</p>
+        {% endfor %}
       </div>
-    {% empty %}
-      <p class="text-light">No movies found.</p>
-    {% endfor %}
-  </div>
 
-  <!-- Pagination Controls -->
-  <nav aria-label="Movies pagination" class="mt-4">
-    <ul class="pagination justify-content-center">
-      {% if page_obj.has_previous %}
-        <li class="page-item">
-          <a class="page-link bg-dark text-light border-secondary" href="?page={{ page_obj.previous_page_number }}&q={{ query }}&genre={{ genre_filter }}&sort={{ sort }}">Previous</a>
-        </li>
-      {% endif %}
+      <nav aria-label="Movies pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link bg-dark text-light border-secondary"
+              href="?page={{ page_obj.previous_page_number }}&q={{ query }}&genre={{ genre_filter }}&sort={{ sort }}">Previous</a>
+          </li>
+          {% endif %}
 
-      {# Sliding window pagination: show first, last, current±2, with ellipses #}
-      {% with total_pages=page_obj.paginator.num_pages current=page_obj.number %}
-        {% if total_pages > 1 %}
+          {% with total_pages=page_obj.paginator.num_pages current=page_obj.number %}
+          {% if total_pages > 1 %}
           {# Always show first page #}
           <li class="page-item {% if current == 1 %}active{% endif %}">
-            <a class="page-link bg-dark text-light border-secondary" href="?page=1&q={{ query }}&genre={{ genre_filter }}&sort={{ sort }}">1</a>
+            <a class="page-link bg-dark text-light border-secondary"
+              href="?page=1&q={{ query }}&genre={{ genre_filter }}&sort={{ sort }}">1</a>
           </li>
           {# Show ellipsis if needed #}
           {% if current|add:'-2' > 2 %}
-            <li class="page-item disabled"><span class="page-link bg-dark text-light border-secondary">...</span></li>
+          <li class="page-item disabled"><span class="page-link bg-dark text-light border-secondary">...</span></li>
           {% endif %}
           {# Show pages current-2 to current+2 #}
           {% for num in total_pages|make_list %}
-            {% with num=num|stringformat:"i" %}
-              {% if num|add:'0' >= current|add:'-2' and num|add:'0' <= current|add:'2' and num|add:'0' != 1 and num|add:'0' != total_pages %}
-                <li class="page-item {% if current == num|add:'0' %}active{% endif %}">
-                  <a class="page-link bg-dark text-light border-secondary" href="?page={{ num }}&q={{ query }}&genre={{ genre_filter }}&sort={{ sort }}">{{ num }}</a>
-                </li>
-              {% endif %}
-            {% endwith %}
+          {% with num=num|stringformat:"i" %}
+          {% if num|add:'0' >= current|add:'-2' and num|add:'0' <= current|add:'2' and num|add:'0' != 1 and num|add:'0' != total_pages %}
+          <li class="page-item {% if current == num|add:'0' %}active{% endif %}">
+            <a class="page-link bg-dark text-light border-secondary"
+              href="?page={{ num }}&q={{ query }}&genre={{ genre_filter }}&sort={{ sort }}">{{ num }}</a>
+          </li>
+          {% endif %}
+          {% endwith %}
           {% endfor %}
           {# Show ellipsis if needed #}
           {% if current|add:'2' < total_pages|add:'-1' %}
-            <li class="page-item disabled"><span class="page-link bg-dark text-light border-secondary">...</span></li>
+          <li class="page-item disabled"><span class="page-link bg-dark text-light border-secondary">...</span></li>
           {% endif %}
           {# Always show last page if more than one #}
           {% if total_pages > 1 %}
-            <li class="page-item {% if current == total_pages %}active{% endif %}">
-              <a class="page-link bg-dark text-light border-secondary" href="?page={{ total_pages }}&q={{ query }}&genre={{ genre_filter }}&sort={{ sort }}">{{ total_pages }}</a>
-            </li>
+          <li class="page-item {% if current == total_pages %}active{% endif %}">
+            <a class="page-link bg-dark text-light border-secondary"
+              href="?page={{ total_pages }}&q={{ query }}&genre={{ genre_filter }}&sort={{ sort }}">{{ total_pages }}</a>
+          </li>
           {% endif %}
-        {% endif %}
-      {% endwith %}
+          {% endif %}
+          {% endwith %}
 
-      {% if page_obj.has_next %}
-        <li class="page-item">
-          <a class="page-link bg-dark text-light border-secondary" href="?page={{ page_obj.next_page_number }}&q={{ query }}&genre={{ genre_filter }}&sort={{ sort }}">Next</a>
-        </li>
-      {% endif %}
-    </ul>
-  </nav>
+          {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link bg-dark text-light border-secondary"
+              href="?page={{ page_obj.next_page_number }}&q={{ query }}&genre={{ genre_filter }}&sort={{ sort }}">Next</a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+
+    </div>
+  </div>
 </div>
 {% endblock %}

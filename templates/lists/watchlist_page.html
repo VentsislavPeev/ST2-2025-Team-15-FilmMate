@@ -6,10 +6,10 @@
   <h2 class="mb-4">📺 {{ watchlist_owner.username }}'s Watchlist</h2>
 
   {% if watchlist_movies %}
-    <div class="row">
+    <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-4">
       {% for movie in watchlist_movies %}
-        <div class="col-md-3 mb-3">
-          <div class="card bg-secondary text-light h-100">
+        <div class="col">
+          <div class="card bg-dark text-light h-100 border-secondary">
             <a href="{% url 'movies:movie_detail' movie.id %}" class="text-decoration-none text-light">
               {% if movie.poster %}
                 <img src="{{ movie.poster }}" class="card-img-top" alt="{{ movie.title }}">
@@ -25,12 +25,12 @@
   {% else %}
     <p class="text-muted">This watchlist is empty.</p>
   {% endif %}
-</div>
 
-<div class="mt-4">
+  <div class="mt-4">
     <a href="{% url 'users:profile' %}" class="btn btn-secondary">
       ← Back to My Profile
     </a>
   </div>
-  
+
+</div>
 {% endblock %}

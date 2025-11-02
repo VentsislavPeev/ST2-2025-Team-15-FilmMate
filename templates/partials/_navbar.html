@@ -1,80 +1,82 @@
 {% load static %}
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top border-bottom border-secondary">
   <div class="container">
-    <!-- Brand -->
+
     <a class="navbar-brand d-flex align-items-center fw-bold" href="{% url 'movies:home' %}">
-     <img src="{% static 'images/favicon.ico' %}" alt="FilmMate Logo" width="60" height="60" class="me-2 rounded-circle">
-     FilmMate
+      FilmMate
     </a>
 
-
-    <!-- Mobile toggle -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <!-- Navbar content -->
-    <div class="collapse navbar-collapse justify-content-between" id="navbarContent">
-      <!-- Left links -->
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-           <a class="btn btn-outline-light ms-3 {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+    <div class="collapse navbar-collapse" id="navbarContent">
+
+      <ul class="navbar-nav mb-2 mb-lg-0 me-lg-3 gap-lg-2">
+
+        <li class="nav-item my-1 my-lg-0">
+          <a class="btn btn-outline-light w-100 w-lg-auto {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
              href="{% url 'movies:home' %}">
-             Home
+            Home
           </a>
         </li>
 
-        <!-- All Movies Button -->
-        <li class="nav-item">
-          <a class="btn btn-outline-light ms-3 {% if request.resolver_match.url_name == 'movies_all' %}active{% endif %}"
+        <li class="nav-item my-1 my-lg-0">
+          <a class="btn btn-outline-light text-nowrap w-100 w-lg-auto {% if request.resolver_match.url_name == 'movies_all' %}active{% endif %}"
              href="{% url 'movies:movies_all' %}">
-             🎬 All Movies
+            🎬 All Movies
           </a>
         </li>
+
       </ul>
 
+      <form class="d-flex my-2 my-lg-0 ms-lg-3 flex-grow-1 justify-content-lg-end" 
+      method="get" action="{% url 'movies:movie_search' %}">
+
+  <input
+    name="q"
+    class="form-control bg-dark text-light border-secondary me-2 flex-grow-1"
+    type="search"
+    placeholder="Search movies"
+    aria-label="Search"
+    style="max-width: 350px;">
+    
+  <button 
+    class="btn btn-outline-success flex-md-grow-1 flex-lg-grow-0 w-auto w-md-100" 
+    type="submit">
+    Search
+  </button>
+
+</form>
 
 
-      <!-- Search bar -->
-      <form class="d-flex" method="get" action="{% url 'movies:movie_search' %}">
-        <input
-          name="q"
-          class="form-control me-2 bg-dark text-light border-secondary"
-          type="search"
-          placeholder="Search movies"
-          aria-label="Search">
-        <button class="btn btn-outline-success ms-1" type="submit">Search</button>
-      </form>
+      <ul class="navbar-nav mb-2 mb-lg-0 ms-lg-3">
 
-      <!-- Right side: auth actions -->
-      <ul class="navbar-nav ms-3 mb-2 mb-lg-0">
         {% if request.user.is_authenticated %}
-          <!-- User dropdown -->
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <li class="nav-item dropdown w-100 w-lg-auto">
+            <a class="nav-link dropdown-toggle d-flex align-items-center justify-content-center justify-content-lg-start" href="#" data-bs-toggle="dropdown">
+
               {% if request.user.profile_pic %}
-                <img src="{{ request.user.profile_pic.url }}" alt="{{ request.user.username }}" class="rounded-circle" width="36" height="36">
+                <img src="{{ request.user.profile_pic.url }}" class="rounded-circle" width="36" height="36">
               {% else %}
-                <svg class="rounded-circle bg-secondary" width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
-                  <rect width="24" height="24" rx="12" fill="#6c757d" />
+                <svg class="rounded-circle bg-secondary" width="36" height="36" viewBox="0 0 24 24">
+                  <rect width="24" height="24" rx="12" fill="#6c757d"/>
                   <path d="M12 12a3 3 0 100-6 3 3 0 000 6zm0 2c-3 0-5 1.5-5 3v1h10v-1c0-1.5-2-3-5-3z" fill="#fff"/>
                 </svg>
               {% endif %}
+
               <span class="ms-2 d-none d-lg-inline">{{ request.user.username }}</span>
             </a>
 
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+            <ul class="dropdown-menu dropdown-menu-end w-100 w-lg-auto">
               <li><a class="dropdown-item" href="{% url 'users:profile' %}">👤 Profile</a></li>
               <li><hr class="dropdown-divider"></li>
-
-              <!-- Extra navigation inside dropdown -->
               <li><a class="dropdown-item" href="#">🎥 My Films</a></li>
               <li><a class="dropdown-item" href="#">📝 My Reviews</a></li>
               <li><a class="dropdown-item" href="{% url 'lists:watchlist_page' request.user.id %}">📺 Watchlist</a></li>
               <li><a class="dropdown-item" href="{% url 'lists:list_overview' %}">📚 My Lists</a></li>
               <li><a class="dropdown-item" href="{% url 'users:friend_requests' %}">👥 Friend Requests</a></li>
-
               <li><hr class="dropdown-divider"></li>
               <li>
                 <form method="post" action="{% url 'users:logout' %}">
@@ -84,12 +86,14 @@
               </li>
             </ul>
           </li>
-
         {% else %}
-          <li class="nav-item">
-            <a class="btn btn-outline-light ms-2" href="{% url 'users:login' %}">Log in</a>
+          <li class="nav-item my-1 my-lg-0">
+            <a class="btn btn-outline-light w-100 w-lg-auto" href="{% url 'users:login' %}">
+              Log in
+            </a>
           </li>
         {% endif %}
+
       </ul>
     </div>
   </div>
