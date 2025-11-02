@@ -94,7 +94,7 @@
       <h4 class="mt-5 mb-3">👥 Friends</h4>
       <div class="d-flex flex-wrap gap-4">
         {% for friend in friends %}
-        <div> 
+        <div>
           {% if friend.id == request.user.id %}
           <a href="{% url 'users:profile' %}" class="text-decoration-none text-light d-inline-block text-center">
             {% else %}
