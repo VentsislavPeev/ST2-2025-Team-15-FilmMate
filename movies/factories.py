@@ -14,7 +14,7 @@ class MovieFactory:
         """Create and return a Movie instance with genres and poster URL."""
 
         # Skip duplicates
-        if Movie.objects.filter(title=title).exists():
+        if Movie.objects.filter(title=title, year=year).exists():
             return None  # skip duplicates gracefully
 
         # Determine final poster URL
