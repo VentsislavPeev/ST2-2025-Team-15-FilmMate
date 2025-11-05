@@ -4,9 +4,12 @@ from movies.models import Movie
 from genres.models import Genre
 from lists.models import List
 from django.contrib.auth.decorators import login_required
+from reviews.forms import ReviewForm
 from users.models import FriendRequest
 from django.shortcuts import get_object_or_404, redirect
 from movies.models import WatchedMovie 
+from django.db.models import Avg
+
 
 
 def movie_home(request):
@@ -54,40 +57,59 @@ def movie_search(request):
 
 @login_required
 def movie_detail(request, pk):
-    """Show movie details + reviews + toggle watchlist + mark as watched."""
+    """Show movie details + reviews + toggle watchlist + mark as watched + submit review."""
     movie = get_object_or_404(Movie, pk=pk)
-    reviews = movie.review_set.all().order_by('-date') if hasattr(movie, 'review_set') else []
+    reviews = movie.review_set.all().select_related("user").order_by("-date")
 
-    # Get or create Watchlist
+    # Get user's Watchlist (creates one if missing)
     watchlist, _ = List.objects.get_or_create(user=request.user, name="Watchlist")
     in_watchlist = movie in watchlist.movies.all()
 
-    # Check if movie is already watched
+    # Check if the movie is already watched
     watched = WatchedMovie.objects.filter(user=request.user, movie=movie).exists()
+
+    form = ReviewForm()
 
     if request.method == 'POST':
         action = request.POST.get('action')
 
-        # ✅ Handle "Add/Remove from Watchlist"
+        # Toggle Watchlist
         if action == 'toggle_watchlist':
             if in_watchlist:
                 watchlist.movies.remove(movie)
             else:
                 watchlist.movies.add(movie)
+            return redirect('movies:movie_detail', pk=pk)
 
-        # ✅ Handle "Mark as Watched"
+        # Mark as Watched (also remove from watchlist)
         elif action == 'mark_watched':
             WatchedMovie.objects.get_or_create(user=request.user, movie=movie)
             if in_watchlist:
-                watchlist.movies.remove(movie)  # ❌ Remove from watchlist if watched
+                watchlist.movies.remove(movie)
+            return redirect('movies:movie_detail', pk=pk)
 
-        return redirect('movies:movie_detail', pk=pk)
+        # Submit Review
+        elif action == 'submit_review':
+            form = ReviewForm(request.POST)
+            if form.is_valid():
+                review = form.save(commit=False)
+                review.user = request.user
+                review.movie = movie
+                review.save()
+
+                # Recalculate and update the movie's average rating
+                avg_rating = movie.review_set.aggregate(Avg("rating"))["rating__avg"] or 0
+                movie.rating = round(avg_rating, 1)
+                movie.save(update_fields=["rating"])
+
+                return redirect('movies:movie_detail', pk=pk)
 
     context = {
         'movie': movie,
         'reviews': reviews,
         'in_watchlist': in_watchlist,
         'watched': watched,
+        'form': form,
     }
     return render(request, 'movies/movie_detail.html', context)
 
