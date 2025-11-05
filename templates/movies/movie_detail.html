@@ -74,41 +74,50 @@
         <div class="card-body ">
           <div class="d-flex justify-content-between align-items-start">
             <div>
-              <!-- TODO: Make the buttons functional -->
-              {% if request.user.is_authenticated %}
-  <form method="post" action="{% url 'movies:movie_detail' movie.id %}" class="d-inline me-2">
+              
+            {% if request.user.is_authenticated %}
+  <div class="d-flex flex-column align-items-start gap-2 mt-3">
+    <!-- Watchlist -->
+    <form method="post" action="{% url 'movies:movie_detail' movie.id %}">
       {% csrf_token %}
+      <input type="hidden" name="action" value="toggle_watchlist">
       {% if in_watchlist %}
-          <button type="submit" class="btn btn-success btn-sm">
-              ✅ Added to Watchlist
-          </button>
+        <button type="submit" class="btn btn-success btn-sm w-100">
+          ✅ Added to Watchlist
+        </button>
       {% else %}
-          <button type="submit" class="btn btn-outline-light btn-sm">
-              ➕ Add to Watchlist
-          </button>
+        <button type="submit" class="btn btn-outline-light btn-sm w-100">
+          ➕ Add to Watchlist
+        </button>
       {% endif %}
-  </form>
+    </form>
 
-  <!-- ✅ Watched toggle button -->
-  <form method="post" action="{% url 'movies:toggle_watched' movie.id %}" class="d-inline me-2">
+    <!-- Mark as Watched -->
+    <form method="post" action="{% url 'movies:movie_detail' movie.id %}">
       {% csrf_token %}
-      {% if is_watched %}
-          <button type="submit" class="btn btn-warning btn-sm">
-              👁️ Watched
-          </button>
+      <input type="hidden" name="action" value="mark_watched">
+      {% if watched %}
+        <button type="button" class="btn btn-secondary btn-sm w-100" disabled>
+          👁 Already Watched
+        </button>
       {% else %}
-          <button type="submit" class="btn btn-outline-warning btn-sm">
-              👁️ Mark as Watched
-          </button>
+        <button type="submit" class="btn btn-primary btn-sm w-100">
+          👁 Mark as Watched
+        </button>
       {% endif %}
-  </form>
+    </form>
 
-  <a href="#" class="btn btn-primary btn-sm">Write a Review</a>
+    <!-- Write a Review -->
+    <a href="#" class="btn btn-info btn-sm w-100">
+      ✍️ Write a Review
+    </a>
+  </div>
 {% else %}
   <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-primary btn-sm">
-      Login to review
+    Login to review
   </a>
 {% endif %}
+
 
 
               

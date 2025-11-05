@@ -54,42 +54,40 @@ def movie_search(request):
 
 @login_required
 def movie_detail(request, pk):
-    """Show movie details + reviews + toggle watchlist and watched status."""
+    """Show movie details + reviews + toggle watchlist + mark as watched."""
     movie = get_object_or_404(Movie, pk=pk)
-    reviews = movie.review_set.all().order_by('-date')
+    reviews = movie.review_set.all().order_by('-date') if hasattr(movie, 'review_set') else []
 
-    # Get or create the user's Watchlist
+    # Get or create Watchlist
     watchlist, _ = List.objects.get_or_create(user=request.user, name="Watchlist")
-
-    # Check if the movie is in the watchlist
     in_watchlist = movie in watchlist.movies.all()
 
-    # Check if the movie is marked as watched
-    is_watched = WatchedMovie.objects.filter(user=request.user, movie=movie).exists()
+    # Check if movie is already watched
+    watched = WatchedMovie.objects.filter(user=request.user, movie=movie).exists()
 
-    # Handle POST actions
     if request.method == 'POST':
-        if 'toggle_watchlist' in request.POST:
-            # Toggle the movie in the watchlist
+        action = request.POST.get('action')
+
+        # ✅ Handle "Add/Remove from Watchlist"
+        if action == 'toggle_watchlist':
             if in_watchlist:
                 watchlist.movies.remove(movie)
             else:
                 watchlist.movies.add(movie)
-            return redirect('movies:movie_detail', pk=pk)
 
-        elif 'toggle_watched' in request.POST:
-            # Toggle watched status
-            if is_watched:
-                WatchedMovie.objects.filter(user=request.user, movie=movie).delete()
-            else:
-                WatchedMovie.objects.create(user=request.user, movie=movie)
-            return redirect('movies:movie_detail', pk=pk)
+        # ✅ Handle "Mark as Watched"
+        elif action == 'mark_watched':
+            WatchedMovie.objects.get_or_create(user=request.user, movie=movie)
+            if in_watchlist:
+                watchlist.movies.remove(movie)  # ❌ Remove from watchlist if watched
+
+        return redirect('movies:movie_detail', pk=pk)
 
     context = {
         'movie': movie,
         'reviews': reviews,
         'in_watchlist': in_watchlist,
-        'is_watched': is_watched,
+        'watched': watched,
     }
     return render(request, 'movies/movie_detail.html', context)
 
