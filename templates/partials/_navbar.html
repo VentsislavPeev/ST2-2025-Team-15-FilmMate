@@ -72,7 +72,7 @@
             <ul class="dropdown-menu dropdown-menu-end w-100 w-lg-auto">
               <li><a class="dropdown-item" href="{% url 'users:profile' %}">👤 Profile</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#">🎥 My Films</a></li>
+              <li><a class="dropdown-item" href="{% url 'movies:my_films' %}">🎥 My Films</a></li>
               <li><a class="dropdown-item" href="#">📝 My Reviews</a></li>
               <li><a class="dropdown-item" href="{% url 'lists:watchlist_page' request.user.id %}">📺 Watchlist</a></li>
               <li><a class="dropdown-item" href="{% url 'lists:list_overview' %}">📚 My Lists</a></li>

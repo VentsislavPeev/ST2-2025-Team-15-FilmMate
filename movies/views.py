@@ -125,6 +125,27 @@ def toggle_watched(request, movie_id):
 
     return redirect('movies:movie_detail', pk=movie_id)
 
+@login_required
+def my_films(request):
+    """Display all movies the user has watched, with their ratings."""
+    watched_movies = WatchedMovie.objects.filter(user=request.user).select_related("movie")
+    reviews = {r.movie.id: r for r in request.user.review_set.all()}
+
+    # Combine watched movies with rating info (if reviewed)
+    watched_data = []
+    for entry in watched_movies:
+        movie = entry.movie
+        review = reviews.get(movie.id)
+        watched_data.append({
+            "movie": movie,
+            "rating": review.rating if review else None,
+            "review_text": review.text if review else None,
+        })
+
+    context = {"watched_data": watched_data}
+    return render(request, "movies/my_films.html", context)
+
+
 def movies_all(request):
     query = request.GET.get('q', '')
     genre_filter = request.GET.get('genre', '')
@@ -158,3 +179,5 @@ def movies_all(request):
         'genre_filter': genre_filter,
         'sort': sort,
     })
+    
+    
