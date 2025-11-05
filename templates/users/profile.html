@@ -43,27 +43,29 @@
       </div>
       {% endif %}
 
-      <h4 class="mt-4 mb-3">🎬 Recent Activity</h4>
+      <h4 class="mt-5 mb-3">👁 Recently Watched</h4>
 
-      <div class="row row-cols-2 row-cols-md-4 g-4">
-        {% for review in recent_reviews %}
-        <div class="col">
-          <div class="card bg-dark text-light h-100 border-secondary">
-            <a href="{% url 'movies:movie_detail' review.movie.id %}" class="text-decoration-none">
-              {% if review.movie.poster %}
-              <img src="{{ review.movie.poster }}" class="card-img-top" alt="{{ review.movie.title }}">
-              {% endif %}
-            </a>
-            <div class="card-body">
-              <h6 class="card-title mb-1">{{ review.movie.title }}</h6>
-              <p class="card-text small text-muted mb-0">⭐ {{ review.rating }}/10</p>
-            </div>
-          </div>
-        </div>
-        {% empty %}
-        <p class="text-muted">No recent activity yet.</p>
-        {% endfor %}
+<div class="row row-cols-2 row-cols-md-4 g-4">
+  {% for watched in recent_watched_movies %}
+  <div class="col">
+    <div class="card bg-dark text-light h-100 border-secondary">
+      <a href="{% url 'movies:movie_detail' watched.movie.id %}" class="text-decoration-none">
+        {% if watched.movie.poster %}
+        <img src="{{ watched.movie.poster }}" class="card-img-top" alt="{{ watched.movie.title }}">
+        {% endif %}
+      </a>
+      <div class="card-body">
+        <h6 class="card-title mb-1">{{ watched.movie.title }}</h6>
+        <p class="card-text small text-muted mb-0">Watched on {{ watched.watched_at|date:"M d, Y" }}</p>
       </div>
+    </div>
+  </div>
+  {% empty %}
+  <p class="text-muted">No watched movies yet.</p>
+  {% endfor %}
+</div>
+
+
 
 
       <h4 class="mt-5 mb-3">

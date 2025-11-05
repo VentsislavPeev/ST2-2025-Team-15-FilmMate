@@ -5,6 +5,8 @@ from genres.models import Genre
 from lists.models import List
 from django.contrib.auth.decorators import login_required
 from users.models import FriendRequest
+from django.shortcuts import get_object_or_404, redirect
+from movies.models import WatchedMovie 
 
 
 def movie_home(request):
@@ -50,31 +52,58 @@ def movie_search(request):
     }
     return render(request, 'movies/home.html', context)
 
+@login_required
 def movie_detail(request, pk):
-    """Show movie details + reviews + toggle watchlist with a single button."""
+    """Show movie details + reviews + toggle watchlist and watched status."""
     movie = get_object_or_404(Movie, pk=pk)
     reviews = movie.review_set.all().order_by('-date')
 
     # Get or create the user's Watchlist
     watchlist, _ = List.objects.get_or_create(user=request.user, name="Watchlist")
 
-    # Check if the movie is currently in the watchlist
+    # Check if the movie is in the watchlist
     in_watchlist = movie in watchlist.movies.all()
 
+    # Check if the movie is marked as watched
+    is_watched = WatchedMovie.objects.filter(user=request.user, movie=movie).exists()
+
+    # Handle POST actions
     if request.method == 'POST':
-        # Toggle the movie in the watchlist
-        if in_watchlist:
-            watchlist.movies.remove(movie)
-        else:
-            watchlist.movies.add(movie)
-        return redirect('movies:movie_detail', pk=pk)  # Reload page to update button
+        if 'toggle_watchlist' in request.POST:
+            # Toggle the movie in the watchlist
+            if in_watchlist:
+                watchlist.movies.remove(movie)
+            else:
+                watchlist.movies.add(movie)
+            return redirect('movies:movie_detail', pk=pk)
+
+        elif 'toggle_watched' in request.POST:
+            # Toggle watched status
+            if is_watched:
+                WatchedMovie.objects.filter(user=request.user, movie=movie).delete()
+            else:
+                WatchedMovie.objects.create(user=request.user, movie=movie)
+            return redirect('movies:movie_detail', pk=pk)
 
     context = {
         'movie': movie,
         'reviews': reviews,
         'in_watchlist': in_watchlist,
+        'is_watched': is_watched,
     }
     return render(request, 'movies/movie_detail.html', context)
+
+
+
+@login_required
+def toggle_watched(request, movie_id):
+    movie = get_object_or_404(Movie, id=movie_id)
+    watched_entry, created = WatchedMovie.objects.get_or_create(user=request.user, movie=movie)
+
+    if not created:
+        watched_entry.delete()
+
+    return redirect('movies:movie_detail', pk=movie_id)
 
 def movies_all(request):
     query = request.GET.get('q', '')
