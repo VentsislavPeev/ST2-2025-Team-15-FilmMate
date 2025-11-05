@@ -55,7 +55,7 @@ def movie_search(request):
     }
     return render(request, 'movies/home.html', context)
 
-@login_required
+
 def movie_detail(request, pk):
     """Show movie details + reviews + toggle watchlist + mark as watched + submit review."""
     movie = get_object_or_404(Movie, pk=pk)
