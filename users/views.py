@@ -12,6 +12,8 @@ from reviews.models import Review
 from lists.models import List
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
+from movies.models import WatchedMovie
+
 
 User = get_user_model()
 
@@ -151,19 +153,25 @@ def profile_view(request, user_id=None):
     else:
         profile_user = get_object_or_404(CustomUser, pk=user_id)
 
-    # Shared data
-    reviews = Review.objects.filter(user=profile_user).select_related('movie')[:4]
+    # Watchlist
     watchlist = List.objects.filter(user=profile_user, name__icontains="watchlist").first()
     watchlist_movies = watchlist.movies.all()[:4] if watchlist else []
-    friends = profile_user.friends.all()
 
-    seen_movies_count = Review.objects.filter(user=profile_user).values_list('movie', flat=True).distinct().count()
-    all_reviews_count = Review.objects.filter(user=profile_user).count()
+    # Watched movies (simple version)
+    
+    recent_watched_movies = (
+        WatchedMovie.objects.filter(user=profile_user)
+        .select_related('movie')
+        .order_by('-watched_at')[:4]
+    )
+
+    friends = profile_user.friends.all()
+    seen_movies_count = recent_watched_movies.count()
 
     is_own_profile = (profile_user == request.user)
     is_friend = request.user.friends.filter(pk=profile_user.pk).exists() if not is_own_profile else False
 
-    # **Check if the current user has already sent a friend request**
+    # Check if the current user has already sent a friend request
     friend_request_sent = False
     if not is_own_profile and not is_friend:
         friend_request_sent = FriendRequest.objects.filter(
@@ -175,14 +183,14 @@ def profile_view(request, user_id=None):
         'profile_user': profile_user,
         'is_own_profile': is_own_profile,
         'is_friend': is_friend,
-        'friend_request_sent': friend_request_sent, 
-        'recent_reviews': reviews,
+        'friend_request_sent': friend_request_sent,
         'recent_watchlist_movies': watchlist_movies,
+        'recent_watched_movies': recent_watched_movies,
         'friends': friends,
         'seen_movies_count': seen_movies_count,
-        'all_reviews_count': all_reviews_count,
     }
     return render(request, 'users/profile.html', context)
+
 
 @login_required
 def username_autocomplete(request):

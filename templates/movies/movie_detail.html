@@ -1,61 +1,58 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ movie.title }} ({{ movie.year }}) — FilmMate{% endblock %}
+{% block title %}
+  {{ movie.title }} ({{ movie.year }}) — FilmMate
+{% endblock %}
 
 {% block content %}
 <div class="container my-4">
   <div class="row g-4">
-    <!-- Left column: poster + basic info -->
+
+    <!-- 🎞 Left column: Poster and quick info -->
     <div class="col-lg-3">
       <div class="card bg-dark text-light border-secondary">
-        <img src="{{ movie.poster }}" class="card-img-top img-fluid" alt="{{ movie.title }} poster">
+        <img src="{{ movie.poster }}" class="card-img-top img-fluid" alt="{{ movie.title }} poster" />
         <div class="card-body">
-          <p class="mb-1 small ">Directed by {{ movie.director }}</p>
-
-          
-
+          <p class="mb-1 small">Directed by {{ movie.director }}</p>
+          <p class="mb-2"><strong class="text-warning">★ {{ movie.rating|floatformat:1 }}</strong> / 10</p>
           <p class="small text-muted">Last updated: {{ movie.rating_last_updated|date:'SHORT_DATETIME_FORMAT' }}</p>
-
         </div>
       </div>
     </div>
 
-    <!-- Center column: description, reviews -->
+    <!-- 📝 Center column: Description and reviews -->
     <div class="col-lg-5 border-0">
       <div class="card p-3 bg-dark text-light border-0">
-        <div class="card-body ">
-          <div class="d-flex justify-content-between align-items-start">
-            <h2 class="mb-2">{{ movie.title }}</h2>
-          </div>
-
+        <div class="card-body">
+          <h2 class="mb-2">{{ movie.title }}</h2>
           <p class="mt-2">{{ movie.description }}</p>
 
           <hr>
 
           <div class="mb-2">
-            <strong>Genres: </strong>
-            <!-- TODO: Make the genre links functional; Redirect to all movies of a certain genre when clicked. -->
+            <strong>Genres:</strong>
             {% for g in movie.genres.all %}
               <a href="#" class="badge bg-secondary text-light me-1">{{ g.name }}</a>
             {% endfor %}
           </div>
 
-
           <hr>
 
-          <h5>Community reviews</h5>
+          <h5>🎬 Community Reviews</h5>
           {% if reviews %}
             <ul class="list-unstyled">
               {% for review in reviews %}
-                <li class="mb-3">
+                <li class="mb-3 border-bottom pb-2">
                   <div class="d-flex align-items-start">
-                    <img src="{{ review.user.profile_pic.url|default_if_none:'' }}" class="rounded-circle me-3" width="48" height="48" alt="{{ review.user.username }}">
+                    {% if review.user.profile_pic %}
+                      <img src="{{ review.user.profile_pic.url }}" class="rounded-circle me-3" width="48" height="48" alt="{{ review.user.username }}">
+                    {% endif %}
                     <div>
                       <div class="d-flex align-items-center">
                         <strong>{{ review.user.username }}</strong>
                         <small class="text-muted ms-2">{{ review.date|date:'SHORT_DATETIME_FORMAT' }}</small>
                       </div>
-                      <div class="small text-warning">★ {{ review.rating|divisibleby:2 }}/5</div>
+                      <div class="small text-warning">★ {{ review.rating }}/10</div>
                       <p class="mb-0">{{ review.text }}</p>
                     </div>
                   </div>
@@ -63,48 +60,93 @@
               {% endfor %}
             </ul>
           {% else %}
-            <p class="text-muted">No reviews yet.</p>
+            <p class="text-muted">No reviews yet. Be the first to review this movie!</p>
           {% endif %}
-
         </div>
       </div>
     </div>
+
+    <!-- 🧭 Right column: Actions -->
     <div class="col-lg-4">
       <div class="card p-3 bg-dark text-light border-secondary">
-        <div class="card-body ">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <!-- TODO: Make the buttons functional -->
-              {% if request.user.is_authenticated %}
-              <form method="post" action="{% url 'movies:movie_detail' movie.id %}" class="d-inline me-2">
-        {% csrf_token %}
-        {% if in_watchlist %}
-            <button type="submit" class="btn btn-success btn-sm">
-                ✅ Added to Watchlist
-            </button>
-        {% else %}
-            <button type="submit" class="btn btn-outline-light btn-sm">
-                ➕ Add to Watchlist
-            </button>
-        {% endif %}
-    </form>
-    <a href="#" class="btn btn-primary btn-sm">Write a Review</a>
-{% else %}
-    <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-primary btn-sm">Login to review</a>
-{% endif %}
-
+        <div class="card-body">
+          
+          {% if request.user.is_authenticated %}
+            <div class="d-flex flex-column align-items-start gap-2 mt-2">
               
+              <!-- 📌 Watchlist -->
+              <form method="post" action="{% url 'movies:movie_detail' movie.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="toggle_watchlist" />
+                {% if in_watchlist %}
+                  <button type="submit" class="btn btn-success btn-sm w-100">✅ Added to Watchlist</button>
+                {% else %}
+                  <button type="submit" class="btn btn-outline-light btn-sm w-100">➕ Add to Watchlist</button>
+                {% endif %}
+              </form>
+
+              <!-- 👁 Mark as Watched -->
+              <form method="post" action="{% url 'movies:movie_detail' movie.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="mark_watched" />
+                {% if watched %}
+                  <button type="button" class="btn btn-secondary btn-sm w-100" disabled>👁 Already Watched</button>
+                {% else %}
+                  <button type="submit" class="btn btn-primary btn-sm w-100">👁 Mark as Watched</button>
+                {% endif %}
+              </form>
+
+              <!-- ✍️ Write a Review -->
+              {% if watched %}
+                <button id="toggle-review-btn" class="btn btn-info btn-sm w-100 mt-2">✍️ Write a Review</button>
+
+                <div id="review-form-container" class="mt-3" style="display: none;">
+                  <form method="post" action="{% url 'movies:movie_detail' movie.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="submit_review" />
+
+                    <div class="mb-3">
+                      <label for="id_rating" class="form-label">Your Rating (1–10)</label>
+                      {{ form.rating }}
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="id_text" class="form-label">Your Review</label>
+                      {{ form.text }}
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-sm w-100">Submit Review</button>
+                  </form>
+                </div>
+              {% else %}
+                <p class="text-light mt-2">👁 You can only review a movie after you’ve marked it as watched.</p>
+              {% endif %}
+
             </div>
-          </div>
-          <hr>
-                    {% if movie.rating == 0 %}
-            <p class="mb-2"><strong class="text-warning">No reviews yet</strong></p>
-          {% else %} 
-            <p class="mb-2"><strong class="text-warning">★ {{ movie.rating|floatformat:1 }}</strong></p>
+          {% else %}
+            <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-primary btn-sm w-100 mt-2">Login to review</a>
           {% endif %}
+          
         </div>
       </div>
     </div>
+
   </div>
 </div>
+
+<!-- 🎬 Toggle review form -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('toggle-review-btn');
+    const form = document.getElementById('review-form-container');
+    if (btn && form) {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        form.style.display =
+          form.style.display === 'none' || !form.style.display ? 'block' : 'none';
+      });
+    }
+  });
+</script>
+
 {% endblock %}
