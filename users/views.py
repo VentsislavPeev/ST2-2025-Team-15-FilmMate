@@ -158,7 +158,7 @@ def profile_view(request, user_id=None):
     watchlist_movies = watchlist.movies.all()[:4] if watchlist else []
 
     # Watched movies (simple version)
-    from movies.models import WatchedMovie  # ✅ make sure this model exists
+    
     recent_watched_movies = (
         WatchedMovie.objects.filter(user=profile_user)
         .select_related('movie')
