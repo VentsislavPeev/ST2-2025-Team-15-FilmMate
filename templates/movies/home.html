@@ -135,7 +135,7 @@
 
               {% if activity.user.profile_pic %}
                 <a href="{% url 'users:profile_other' activity.user.id %}">
-                  <img src="{{ activity.user.profile_pic.url }}" class="rounded-circle" width="30" height="30">
+                  <img src="{{ activity.user.profile_pic.url }}" class="rounded-circle" width="30" height="30" alt="{{ activity.user.username }}">
                 </a>
               {% else %}
                 <a href="{% url 'users:profile_other' activity.user.id %}">
