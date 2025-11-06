@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}All Friend Activity - FilmMate{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h2 class="fw-bold text-light mb-4">All Friend Activity</h2>
+
+  {% if page_obj %}
+  <div class="row row-cols-2 row-cols-md-4 g-4">
+    {% for activity in page_obj %}
+    <div class="col">
+      
+      <div class="card bg-dark border-secondary">
+        <a href="{% url 'movies:movie_detail' activity.movie.id %}">
+          {% if activity.movie.poster %}
+            <img src="{{ activity.movie.poster }}" 
+                 class="card-img-top" 
+                 alt="{{ activity.movie.title }}">
+          {% elif activity.movie.poster_url %}
+            <img src="{{ activity.movie.poster_url }}" 
+                 class="card-img-top" 
+                 alt="{{ activity.movie.title }}">
+          {% else %}
+            <img src="{% static 'images/default-image.jpg' %}" 
+                 class="card-img-top" 
+                 alt="Default poster">
+          {% endif %}
+        </a>
+      </div> 
+
+      <div class="text-light pt-2">
+
+        <!-- ✅ Updated Name + Movie Title Layout -->
+        <div class="d-flex flex-wrap align-items-center mb-1" style="gap: 4px;">
+
+          {% if activity.user.profile_pic %}
+            <a href="{% url 'users:profile_other' activity.user.id %}">
+              <img src="{{ activity.user.profile_pic.url }}" 
+                   class="rounded-circle"
+                   width="30" height="30"
+                   alt="Profile picture of {{ activity.user.username }}">
+            </a>
+          {% else %}
+            <a href="{% url 'users:profile_other' activity.user.id %}">
+              <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center"
+                   style="width:30px; height:30px;">
+                <span class="fw-bold text-white small">
+                  {{ activity.user.username|slice:":1"|upper }}
+                </span>
+              </div>
+            </a>
+          {% endif %}
+
+          <a href="{% url 'users:profile_other' activity.user.id %}"
+             class="text-light fw-semibold text-decoration-none small">
+            {{ activity.user.username }}
+          </a>
+
+          <span class="text-secondary small">watched</span>
+
+          <a href="{% url 'movies:movie_detail' activity.movie.id %}"
+             class="fw-bold text-light text-decoration-none small text-truncate"
+             style="max-width: 140px;">
+            {{ activity.movie.title|default:"Untitled Movie" }}
+          </a>
+        </div>
+
+        <p class="text-muted small mb-0">
+          {{ activity.watched_at|date:"M d, Y" }}
+        </p>
+
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if page_obj.has_other_pages %}
+  <nav aria-label="Activity pagination" class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link bg-dark text-light border-secondary" href="?page={{ page_obj.previous_page_number }}">← Previous</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link bg-dark text-secondary border-secondary">← Previous</span></li>
+      {% endif %}
+
+      <li class="page-item disabled">
+        <span class="page-link bg-dark text-light border-secondary">
+          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+      </li>
+
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link bg-dark text-light border-secondary" href="?page={{ page_obj.next_page_number }}">Next →</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link bg-dark text-secondary border-secondary">Next →</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+
+  {% else %}
+  <p class="text-light small mb-0">No activity found from your friends.</p>
+  {% endif %}
+
+</div>
+{% endblock %}

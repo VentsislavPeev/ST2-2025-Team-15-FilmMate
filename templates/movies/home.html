@@ -64,8 +64,8 @@
   from {opacity: 0; transform: translateY(-10px);}
   to {opacity: 1; transform: translateY(0);}
 }
+.poster { height: 240px; object-fit: cover; }
 </style>
-
 
 <div class="container py-4">
 
@@ -106,33 +106,70 @@
   <section class="mb-5">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h3 class="fw-bold text-light mb-0">New From Friends</h3>
-      <a href="#" class="text-light small text-decoration-none">See all activity →</a>
+      <a href="{% url 'movies:friends_activity' %}" class="text-light small text-decoration-none">See all activity →</a>
     </div>
 
     {% if friend_activities %}
-      <div class="list-group">
+      <div class="d-flex flex-row overflow-auto gap-3 pb-2">
         {% for activity in friend_activities %}
-          <div class="list-group-item bg-dark border-secondary text-light d-flex align-items-start py-3">
-            {% if activity.user.profile_pic %}
-              <img src="{{ activity.user.profile_pic.url }}" class="rounded-circle me-3" width="45" height="45" alt="{{ activity.user.username }}">
-            {% else %}
-              <img src="{% static 'images/default-profile.jpg' %}" class="rounded-circle me-3" width="45" height="45" alt="Default profile">
-            {% endif %}
-            <div>
-              <strong>{{ activity.user.username|default:"Anonymous" }}</strong>
-              <span class="text-secondary small">watched</span>
-              <a href="{% url 'movies:movie_detail' activity.film.id %}" class="text-light fw-semibold text-decoration-none">
-                {{ activity.film.title|default:"Untitled Movie" }}
+        <div class="film-card flex-shrink-0" style="width: 160px;">
+
+          {% if activity.movie and activity.movie.id %}
+            <a href="{% url 'movies:movie_detail' activity.movie.id %}">
+          {% endif %}
+
+          {% if activity.movie.poster %}
+            <img src="{{ activity.movie.poster }}" class="img-fluid rounded shadow-sm poster" alt="{{ activity.movie.title }}">
+          {% elif activity.movie.poster_url %}
+            <img src="{{ activity.movie.poster_url }}" class="img-fluid rounded shadow-sm poster" alt="{{ activity.movie.title }}">
+          {% else %}
+            <img src="{% static 'images/default-image.jpg' %}" class="img-fluid rounded shadow-sm poster" alt="Default poster">
+          {% endif %}
+
+          {% if activity.movie and activity.movie.id %}
+            </a>
+          {% endif %}
+
+          <div class="text-light pt-2">
+            <div class="d-flex flex-wrap align-items-center mb-1" style="gap: 4px;">
+
+              {% if activity.user.profile_pic %}
+                <a href="{% url 'users:profile_other' activity.user.id %}">
+                  <img src="{{ activity.user.profile_pic.url }}" class="rounded-circle" width="30" height="30" alt="{{ activity.user.username }}">
+                </a>
+              {% else %}
+                <a href="{% url 'users:profile_other' activity.user.id %}">
+                  <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center"
+                       style="width:30px; height:30px;">
+                    <span class="fw-bold text-white small">{{ activity.user.username|slice:":1"|upper }}</span>
+                  </div>
+                </a>
+              {% endif %}
+
+              <a href="{% url 'users:profile_other' activity.user.id %}"
+                 class="text-light fw-semibold text-decoration-none small">
+                {{ activity.user.username }}
               </a>
 
-              {% if activity.rating %}
-                <span class="text-warning small">★ {{ activity.rating }}/5</span>
-              {% endif %}
-              {% if activity.comment %}
-                <p class="mb-0 text-secondary small mt-1">“{{ activity.comment }}”</p>
+              <span class="text-secondary small">watched</span>
+
+              {% if activity.movie and activity.movie.id %}
+                <a href="{% url 'movies:movie_detail' activity.movie.id %}"
+                   class="fw-bold text-light text-decoration-none small text-truncate"
+                   style="max-width: 120px;">
+                  {{ activity.movie.title }}
+                </a>
+              {% else %}
+                <span class="text-secondary small">Unknown Movie</span>
               {% endif %}
             </div>
+
+            <p class="text-muted small mb-0">
+              {{ activity.watched_at|date:"M d, Y" }}
+            </p>
+
           </div>
+        </div>
         {% endfor %}
       </div>
     {% else %}

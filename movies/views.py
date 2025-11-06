@@ -13,15 +13,27 @@ from django.db.models import Avg
 
 
 def movie_home(request):
+    """Homepage showing popular films and recent friend activity."""
     popular_films = Movie.objects.all()[7:14]
     friend_activities = []
 
     pending_requests = []
     if request.user.is_authenticated:
+        # Friend requests
         pending_requests = (
             FriendRequest.objects.filter(to_user=request.user)
             .select_related('from_user')
             .order_by('-created')
+        )
+
+        # ✅ NEW FROM FRIENDS
+        friends = request.user.friends.all()
+
+        # Get up to 7 most recent movies watched by friends
+        friend_activities = (
+            WatchedMovie.objects.filter(user__in=friends)
+            .select_related('user', 'movie')
+            .order_by('-watched_at')[:7]
         )
 
     context = {
@@ -31,6 +43,19 @@ def movie_home(request):
     }
     return render(request, 'movies/home.html', context)
 
+@login_required
+def friends_activity(request):
+    friends = request.user.friends.all()
+    activities = (
+        WatchedMovie.objects.filter(user__in=friends)
+        .select_related('user', 'movie')
+        .order_by('-watched_at')
+    )
+    paginator = Paginator(activities, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'movies/friends_activity.html', {'page_obj': page_obj})
 
 def movie_list(request):
     movies = Movie.objects.all()
