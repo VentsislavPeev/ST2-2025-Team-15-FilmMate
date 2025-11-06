@@ -39,7 +39,7 @@
               <img src="{{ activity.user.profile_pic.url }}" 
                    class="rounded-circle"
                    width="30" height="30"
-                   alt="{{ activity.user.username }}">
+                   alt="Profile picture of {{ activity.user.username }}">
             </a>
           {% else %}
             <a href="{% url 'users:profile_other' activity.user.id %}">
