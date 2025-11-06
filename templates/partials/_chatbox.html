@@ -1,0 +1,177 @@
+{% load static %}
+<div id="fm-chatbox" style="position:fixed;bottom:24px;right:24px;z-index:1100;">
+
+<style>
+  .fm-typing-indicator span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin: 0 1px;
+    background-color: #e6edf3;
+    border-radius: 50%;
+    opacity: 0.4;
+    animation: fm-blink 1.4s infinite both;
+  }
+  .fm-typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+  .fm-typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes fm-blink {
+    0% { opacity: 0.4; }
+    20% { opacity: 1; }
+    100% { opacity: 0.4; }
+  }
+</style>
+  <div id="fm-chatbox-panel" style="width:360px;max-width:90vw;display:none;box-shadow:0 6px 20px rgba(0,0,0,.4);">
+    <div class="card" style="background:#0b0f13;color:#e6edf3;border:none;">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>FilmMate Assistant</strong>
+        <div>
+          <button id="fm-chatbox-min" class="btn btn-sm btn-light btn-icon" title="Minimize">_</button>
+          <button id="fm-chatbox-close" class="btn btn-sm btn-danger btn-icon ms-1" title="Close">×</button>
+        </div>
+      </div>
+      <div class="card-body" style="padding:0.75rem;">
+        <div id="fm-chatbox-window" style="height:300px;overflow:auto;padding:0.5rem;background:#071018;border-radius:6px;">
+          <div class="mb-2">
+            <div class="badge bg-primary">Assistant</div>
+            <div class="mt-2">Hi — ask me for movie recommendations 😀.</div>
+          </div>
+        </div>
+
+        <form id="fm-chatbox-form" style="margin-top:.5rem;">
+          {% csrf_token %}
+          <div class="input-group">
+            <input id="fm-chatbox-input" name="message" class="form-control" placeholder="Ask for recommendations...">
+            <button class="btn btn-primary" type="submit">Send</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <button id="fm-chatbox-toggle" class="btn btn-primary" style="border-radius:999px;padding:10px 14px;">💬</button>
+</div>
+<script>
+;(function(){
+  const toggle = document.getElementById('fm-chatbox-toggle');
+  const panel = document.getElementById('fm-chatbox-panel');
+  const closeBtn = document.getElementById('fm-chatbox-close');
+  const minBtn = document.getElementById('fm-chatbox-min');
+  const form = document.getElementById('fm-chatbox-form');
+  const input = document.getElementById('fm-chatbox-input');
+  const win = document.getElementById('fm-chatbox-window');
+
+  const getCookie = (name) => {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  };
+
+  function appendMessage(role, html){
+    const wrapper = document.createElement('div');
+    wrapper.className = 'mb-3';
+    const badge = document.createElement('div');
+    badge.className = role === 'user' ? 'badge bg-secondary' : 'badge bg-primary';
+    badge.textContent = role === 'user' ? 'You' : 'Assistant';
+    const content = document.createElement('div');
+    content.className = 'mt-2';
+    content.innerHTML = html;
+    wrapper.appendChild(badge);
+    wrapper.appendChild(content);
+    win.appendChild(wrapper);
+    win.scrollTop = win.scrollHeight;
+  }
+  
+  // --- ADDED: Helper function for the loading box ---
+  function appendLoadingMessage() {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'mb-3';
+    wrapper.id = 'fm-chat-loading'; // <-- Give it an ID to find it later
+    wrapper.innerHTML = `
+      <div class="badge bg-primary">Assistant</div>
+      <div class="mt-2 fm-typing-indicator">
+        <span></span><span></span><span></span>
+      </div>
+    `;
+    win.appendChild(wrapper);
+    win.scrollTop = win.scrollHeight;
+  }
+  // --- END OF ADDED FUNCTION ---
+
+  toggle.addEventListener('click', ()=>{
+    if(panel.style.display === 'none' || panel.style.display === ''){
+      panel.style.display = 'block';
+      toggle.style.display = 'none';
+      input.focus();
+    }
+  });
+  closeBtn.addEventListener('click', ()=>{
+    panel.style.display = 'none';
+    toggle.style.display = 'inline-block';
+  });
+  minBtn.addEventListener('click', ()=>{
+    panel.style.display = 'none';
+    toggle.style.display = 'inline-block';
+  });
+
+  // --- MODIFIED: The submit form logic ---
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const msg = input.value.trim();
+    if(!msg) return;
+    
+    appendMessage('user', msg);
+    input.value = '';
+    
+    appendLoadingMessage(); // <-- ADD THE LOADING BOX
+    
+    try{
+      const res = await fetch('{% url "movies:chat_api" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({message: msg})
+      });
+      
+      if(!res.ok){ 
+        appendMessage('assistant', 'Sorry, something went wrong.');
+        return; // The 'finally' block will still run
+      }
+      
+      const data = await res.json();
+      appendMessage('assistant', data.reply);
+      
+      if(data.movies && data.movies.length){
+        const list = data.movies.map(m=>`
+          <div class="d-flex my-2">
+            <img src="${m.poster_url}" width="48" height="72" class="me-3"/>
+            <div>
+              <a href="${m.detail_url}" class="fw-bold text-white">${m.title} (${m.year})</a>
+              <div class="small text-white">Directed by ${m.director} • ★ ${m.rating.toFixed(1)}/10</div>
+            </div>
+          </div>
+        `).join('');
+        appendMessage('assistant', list);
+      }
+    }catch(err){
+      appendMessage('assistant', 'Sorry, network error.');
+    } finally {
+      const loadingBox = document.getElementById('fm-chat-loading');
+      if (loadingBox) {
+        loadingBox.remove(); 
+      }
+    }
+  });
+  
+})();
+</script>

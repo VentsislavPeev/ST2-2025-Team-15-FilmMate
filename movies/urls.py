@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from movies import views
 
 app_name = 'movies'
 
@@ -12,4 +12,5 @@ urlpatterns = [
     path('all/', views.movies_all, name='movies_all'),
     path('movie/<int:movie_id>/watched/', views.toggle_watched, name='toggle_watched'),
     path("my-films/", views.my_films, name="my_films"),
+    path('chat/api/', views.chat_api, name='chat_api'),
 ]
