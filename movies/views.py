@@ -29,7 +29,7 @@ def movie_home(request):
         # ✅ NEW FROM FRIENDS
         friends = request.user.friends.all()
 
-        # Get up to 10 most recent movies watched by friends
+        # Get up to 7 most recent movies watched by friends
         friend_activities = (
             WatchedMovie.objects.filter(user__in=friends)
             .select_related('user', 'movie')
