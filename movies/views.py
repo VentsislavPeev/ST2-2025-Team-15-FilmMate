@@ -232,7 +232,7 @@ def get_search_filters_from_ollama(message, genres_list):
     - "genre": string (must be one of: {genres_str})
     - "director": string
     - "year": integer
-    - "rating_gte": float (a number from 0-5, e.g., "4 stars" -> 4.0)
+    - "rating_gte": float (a number from 0-10, e.g., "8 stars" -> 8.0)
     - "keywords": string (for general title/description search)
 
     If you cannot find a value for a key, omit it or set it to null.
