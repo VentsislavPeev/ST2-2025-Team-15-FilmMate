@@ -154,7 +154,7 @@
       if(data.movies && data.movies.length){
         const list = data.movies.map(m=>`
           <div class="d-flex my-2">
-            <img src="${m.poster_url}" width="48" height="72" class="me-3"/>
+            <img src="${m.poster_url}" width="48" height="72" class="me-3" alt="${m.title} poster"/>
             <div>
               <a href="${m.detail_url}" class="fw-bold text-white">${m.title} (${m.year})</a>
               <div class="small text-white">Directed by ${m.director} • ★ ${m.rating.toFixed(1)}/10</div>
