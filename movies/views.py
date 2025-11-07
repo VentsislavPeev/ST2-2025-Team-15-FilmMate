@@ -362,11 +362,11 @@ def chat_api(request):
     filters = get_search_filters_from_ollama(message, genres_list)
     
     qs = Movie.objects.all()
-    filters_applied = False
+    
     
     if filters.get('genre'):
         qs = qs.filter(genres__name__iexact=filters['genre']).distinct()
-        filters_applied = True
+        
     
     qs = qs.order_by('-rating', '-year')[:12]
 
