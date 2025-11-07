@@ -279,7 +279,6 @@ def generate_natural_reply(original_message, movies_list):
     Uses Ollama to generate a conversational reply based on the 
     movies found in the database.
     """
-    #
     if not movies_list:
         
         system_prompt = f"""
